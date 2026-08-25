@@ -1,18 +1,18 @@
-<h1 align="center">SciRepro</h1>
+<h1 align="center">Academic Repro</h1>
 
-<p align="center"><strong>从论文图表，回到可信、可运行、可检验的研究过程</strong></p>
-<p align="center">简体中文 · <a href="README.en.md">English</a> · <a href="scirepro/SKILL.md">Skill 规范</a></p>
+<p align="center"><strong>从论文图表与计算结果，回到可信、可运行、可检验的研究过程</strong></p>
+<p align="center">简体中文 · <a href="README.en.md">English</a> · <a href="academic-repro/SKILL.md">Skill 规范</a></p>
 
-SciRepro 是面向 Codex 的科研图表复现 Skill。它复现图表背后的仿真、训练、测量、统计或算法过程，并判断生成结果能否替换论文原图表、继续支撑同一局部论点。目标不是临摹像素，也不是把一次成功运行写成对整篇论文的证明。
+Academic Repro 是面向 Codex 的学术图表与研究结果复现 Skill。它复现图表背后的仿真、训练、测量、统计或算法过程，并判断生成结果能否替换论文原图表、继续支撑同一局部论点。目标不是临摹像素，也不是把一次成功运行写成对整篇论文的证明。
 
 ## 安装与调用
 
 ```text
-使用 $skill-installer 安装 https://github.com/SciToolsmith/scirepro/tree/main/scirepro
+使用 $skill-installer 安装 https://github.com/SciToolsmith/academic-repro/tree/main/academic-repro
 ```
 
 ```text
-使用 $scirepro 复现这篇论文的图 1、图 6 和表 2；结果应能替换原图表而不改变相邻正文的论点。
+使用 $academic-repro 复现这篇论文的图 1、图 6 和表 2；结果应能替换原图表而不改变相邻正文的论点。
 ```
 
 以上两段是输入到 Codex 对话中的指令，不是终端 Shell 命令。
@@ -21,7 +21,7 @@ SciRepro 是面向 Codex 的科研图表复现 Skill。它复现图表背后的�
 
 ## 核心判断
 
-SciRepro 先判断目标**如何产生、在论文中充当什么证据**，而不是只看外形：
+Academic Repro 先判断目标**如何产生、在论文中充当什么证据**，而不是只看外形：
 
 - 仿真、训练、搜索、优化或统计产生的图、定量表、模型结构和拓扑，属于计算结果；即使看起来像结构示意图，也应复现其生成过程。
 - 参数表和场景表通常是复现输入；定性文献比较、符号表和能力清单属于说明内容。
@@ -46,14 +46,14 @@ SciRepro 先判断目标**如何产生、在论文中充当什么证据**，而�
 
 默认只交付客户真正需要的内容：最终图或表、生成它的最终代码、代码必需且不可再生的输入、最小依赖说明，以及一份含结论、准确复跑命令、关键假设和实质限制的短 README。搜索记录、调试日志、过程草稿、验证清单和无关中间文件留在内部；交付前在干净副本中复跑。
 
-辅助脚本需要 Python 3.10+；PDF 自动提取另需 `Pillow`、`pdfplumber` 和 Poppler。完整规则见 [Skill 规范](scirepro/SKILL.md)。
+辅助脚本需要 Python 3.10+；PDF 自动提取另需 `Pillow`、`pdfplumber` 和 Poppler。完整规则见 [Skill 规范](academic-repro/SKILL.md)。
 
 ## 本地开发与验证
 
 ```bash
-git clone https://github.com/SciToolsmith/scirepro.git
-cd scirepro
-python -m pip install -r scirepro/requirements.txt
+git clone https://github.com/SciToolsmith/academic-repro.git
+cd academic-repro
+python -m pip install -r academic-repro/requirements.txt
 python -m unittest discover -s tests -v
 ```
 
@@ -61,4 +61,4 @@ python -m unittest discover -s tests -v
 
 ## 许可
 
-SciRepro 采用 [MIT License](LICENSE)。论文、数据集、第三方代码和生成成果仍遵循各自的版权、访问条件与许可证。
+Academic Repro 采用 [MIT License](LICENSE)。论文、数据集、第三方代码和生成成果仍遵循各自的版权、访问条件与许可证。

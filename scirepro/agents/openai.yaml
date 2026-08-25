@@ -1,4 +1,0 @@
-interface:
-  display_name: "SciRepro"
-  short_description: "复现科研图表背后的计算过程，并检验论文论点是否保持"
-  default_prompt: "Use $scirepro to classify each target by how it was generated and its evidence role, rebuild the smallest credible data-to-result process, validate credible generation, local-claim preservation, and visual-semantic preservation, then deliver only the rerunnable result and necessary files."

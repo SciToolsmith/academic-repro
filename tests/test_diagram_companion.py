@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-ENSURE = REPO / "scirepro" / "scripts" / "ensure_diagram_companion.py"
+ENSURE = REPO / "academic-repro" / "scripts" / "ensure_diagram_companion.py"
 SKILL_NAME = "sci-diagram-pptx"
 SOURCE_REPO = "SciToolsmith/sci-diagram-pptx"
 SOURCE_PATH = "skills/sci-diagram-pptx"

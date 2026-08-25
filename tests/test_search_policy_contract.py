@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-REFERENCES = REPO / "scirepro" / "references"
+REFERENCES = REPO / "academic-repro" / "references"
 
 
 class ConditionalPolicySurfaceTests(unittest.TestCase):

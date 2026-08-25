@@ -55,7 +55,7 @@ python <skill-root>/scripts/assemble_delivery.py \
   --output-root /path/to/customer-deliveries
 ```
 
-The assembler accepts its current `scirepro.delivery-plan/v4` interface and creates a new destination rather than updating an existing folder. The plan is an internal tool input, not a customer artifact. Its fields fall into a few groups:
+For backward compatibility, the assembler retains the legacy `scirepro.delivery-plan/v4` interface identifier; it is a wire-format name, not the current Skill name. The assembler creates a new destination rather than updating an existing folder. The plan is an internal tool input, not a customer artifact. Its fields fall into a few groups:
 
 - package identity and distribution: schema version, title, slug, conclusion, shared files, and licenses;
 - target identity and scientific boundary: ID, title, kind, route, statuses, assumptions, conclusion, and limitations;

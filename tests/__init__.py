@@ -1,1 +1,1 @@
-"""Offline regression tests for the SciRepro skill repository."""
+"""Offline regression tests for the Academic Repro skill repository."""
