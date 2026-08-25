@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assemble one small, human-first SciRepro customer delivery.
+"""Assemble one small, human-first Academic Repro customer delivery.
 
 The input plan is an internal whitelist.  It is validated but never copied.
 Files are copied into a sibling staging directory and published atomically

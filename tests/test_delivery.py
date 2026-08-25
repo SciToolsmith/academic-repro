@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-ASSEMBLER = REPO / "scirepro/scripts/assemble_delivery.py"
+ASSEMBLER = REPO / "academic-repro/scripts/assemble_delivery.py"
 MAX_FILE_BYTES = 256 * 1024 * 1024
 
 

@@ -6,7 +6,7 @@ Use this route when the supplied image is the only reliable source for the reque
 
 Image-derived work may produce calibrated data points, a partial redraw, editable vector artwork, rerunnable plotting code based on digitized values, or an appearance reconstruction. Keep each recovered value traceable to visible marks and state material uncertainty.
 
-Do not classify a target from appearance alone. A learned architecture, searched cell, optimized topology, clustering tree, or other computational output remains a SciRepro target even when it consists of boxes, nodes, and arrows. With pixels alone, such provenance may be unknown; do not hand it to a diagram skill merely because it looks schematic. Use [diagram-handoff.md](diagram-handoff.md) only when reliable context establishes that the target is an author-drawn explanatory diagram rather than a computed result.
+Do not classify a target from appearance alone. A learned architecture, searched cell, optimized topology, clustering tree, or other computational output remains an Academic Repro target even when it consists of boxes, nodes, and arrows. With pixels alone, such provenance may be unknown; do not hand it to a diagram skill merely because it looks schematic. Use [diagram-handoff.md](diagram-handoff.md) only when reliable context establishes that the target is an author-drawn explanatory diagram rather than a computed result.
 
 ## Four identifiability outcomes
 

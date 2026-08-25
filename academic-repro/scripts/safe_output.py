@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small create-only output helper shared by SciRepro inspection scripts."""
+"""Small create-only output helper shared by Academic Repro inspection scripts."""
 
 from __future__ import annotations
 

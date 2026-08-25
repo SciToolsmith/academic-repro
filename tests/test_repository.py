@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SKILL = REPO / "scirepro"
+SKILL = REPO / "academic-repro"
 REFERENCE_LINK = re.compile(r"\[[^\]]+\]\((references/[^)#]+\.md)(?:#[^)]+)?\)")
 
 
@@ -27,7 +27,7 @@ class RepositoryTests(unittest.TestCase):
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(text.startswith("---\n"))
         frontmatter = text.split("---", 2)[1]
-        self.assertRegex(frontmatter, r"(?m)^name:\s*scirepro\s*$")
+        self.assertRegex(frontmatter, r"(?m)^name:\s*academic-repro\s*$")
         self.assertRegex(frontmatter, r"(?m)^description:\s*\S")
 
         links = list(dict.fromkeys(REFERENCE_LINK.findall(text)))
@@ -66,11 +66,11 @@ class RepositoryTests(unittest.TestCase):
     def test_readmes_present_the_same_small_public_contract(self) -> None:
         chinese = (REPO / "README.md").read_text(encoding="utf-8")
         english = (REPO / "README.en.md").read_text(encoding="utf-8")
-        self.assertEqual(chinese.count('<h1 align="center">SciRepro</h1>'), 1)
-        self.assertEqual(english.count('<h1 align="center">SciRepro</h1>'), 1)
-        for required in ("使用 $skill-installer", "使用 $scirepro", "可信生成", "论点保持", "视觉语义"):
+        self.assertEqual(chinese.count('<h1 align="center">Academic Repro</h1>'), 1)
+        self.assertEqual(english.count('<h1 align="center">Academic Repro</h1>'), 1)
+        for required in ("使用 $skill-installer", "使用 $academic-repro", "可信生成", "论点保持", "视觉语义"):
             self.assertIn(required, chinese)
-        for required in ("Use $skill-installer", "Use $scirepro", "Credible generation", "Claim preservation", "Visual-semantic preservation"):
+        for required in ("Use $skill-installer", "Use $academic-repro", "Credible generation", "Claim preservation", "Visual-semantic preservation"):
             self.assertIn(required, english)
 
     def test_runtime_dependencies_and_pdf_ci_are_declared(self) -> None:

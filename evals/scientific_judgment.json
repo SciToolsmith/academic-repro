@@ -5,7 +5,7 @@
     {
       "id": "computed_nas_structure",
       "prompt": "论文图4-13是神经架构搜索得到的基本单元，画面由节点和带算子名称的连线组成。我要复现它，应由哪个流程负责，验收什么？",
-      "expected_decision": "Keep the target in SciRepro because the structure is an output of search. Reproduce the search or a declared mechanism route and validate the claimed structural result plus material node-edge semantics.",
+      "expected_decision": "Keep the target in Academic Repro because the structure is an output of search. Reproduce the search or a declared mechanism route and validate the claimed structural result plus material node-edge semantics.",
       "failure_mode": "Hands it to a diagram-redrawing tool solely because it contains nodes and connectors.",
       "tags": ["provenance-routing", "visual-semantics"]
     },

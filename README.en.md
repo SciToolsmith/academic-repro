@@ -1,18 +1,18 @@
-<h1 align="center">SciRepro</h1>
+<h1 align="center">Academic Repro</h1>
 
-<p align="center"><strong>From published figures and tables back to a credible, runnable, testable research process</strong></p>
-<p align="center"><a href="README.md">简体中文</a> · English · <a href="scirepro/SKILL.md">Skill specification</a></p>
+<p align="center"><strong>From published figures, tables, and computed structures back to a credible, runnable, testable research process</strong></p>
+<p align="center"><a href="README.md">简体中文</a> · English · <a href="academic-repro/SKILL.md">Skill specification</a></p>
 
-SciRepro is a Codex Skill for reproducing the simulation, training, measurement, statistical, or algorithmic process behind a scientific figure or table. It asks whether the generated result can replace the published target while supporting the same local paper claim. The goal is not pixel imitation, and a successful command is not proof of an entire paper.
+Academic Repro is a Codex Skill for reproducing the simulation, training, measurement, statistical, or algorithmic process behind an academic figure, table, or computed structure. It asks whether the generated result can replace the published target while supporting the same local paper claim. The goal is not pixel imitation, and a successful command is not proof of an entire paper.
 
 ## Install and invoke
 
 ```text
-Use $skill-installer to install https://github.com/SciToolsmith/scirepro/tree/main/scirepro
+Use $skill-installer to install https://github.com/SciToolsmith/academic-repro/tree/main/academic-repro
 ```
 
 ```text
-Use $scirepro to reproduce Figures 1 and 6 and Table 2 from this paper; the results should replace the published targets without changing the nearby argument.
+Use $academic-repro to reproduce Figures 1 and 6 and Table 2 from this paper; the results should replace the published targets without changing the nearby argument.
 ```
 
 Enter both instructions above in a Codex conversation; they are not shell commands.
@@ -21,9 +21,9 @@ Inputs may be a paper with target images, a paper with figure or table identifie
 
 ## Core decisions
 
-SciRepro first asks **how the target was produced and what evidence role it has**, not merely what it looks like:
+Academic Repro first asks **how the target was produced and what evidence role it has**, not merely what it looks like:
 
-- A figure, quantitative table, model structure, or topology produced by simulation, training, search, optimization, or statistics is a computational result. It remains a SciRepro target even when it looks schematic.
+- A figure, quantitative table, model structure, or topology produced by simulation, training, search, optimization, or statistics is a computational result. It remains an Academic Repro target even when it looks schematic.
 - Parameter and scenario tables are usually reproduction inputs; qualitative literature comparisons, notation tables, and capability checklists are explanatory.
 - Only author-drawn theory, process, or mechanism diagrams that are not themselves computational outputs are handed to a scientific-diagram tool.
 - One table may mix input, computed, and explanatory cells; classify it by column or cell group.
@@ -46,14 +46,14 @@ Targets from one experiment share fixed controls such as data split, base scenar
 
 The default customer folder contains only the final figure or table, the final source that produces it, indispensable non-regenerable inputs, minimal dependency instructions, and a short README with the conclusion, exact rerun command, key assumptions, and material limitations. Search history, debug logs, working drafts, validation ledgers, and irrelevant intermediate files remain internal. The proposed folder is rerun from a clean copy before delivery.
 
-Bundled helpers require Python 3.10+. Automatic PDF target extraction also needs `Pillow`, `pdfplumber`, and Poppler. See the [Skill specification](scirepro/SKILL.md) for the full workflow.
+Bundled helpers require Python 3.10+. Automatic PDF target extraction also needs `Pillow`, `pdfplumber`, and Poppler. See the [Skill specification](academic-repro/SKILL.md) for the full workflow.
 
 ## Local development and validation
 
 ```bash
-git clone https://github.com/SciToolsmith/scirepro.git
-cd scirepro
-python -m pip install -r scirepro/requirements.txt
+git clone https://github.com/SciToolsmith/academic-repro.git
+cd academic-repro
+python -m pip install -r academic-repro/requirements.txt
 python -m unittest discover -s tests -v
 ```
 
@@ -61,4 +61,4 @@ Transparent forward-evaluation cases for scientific judgment live in [`evals/sci
 
 ## License
 
-SciRepro is released under the [MIT License](LICENSE). Papers, datasets, third-party code, and generated artifacts retain their respective rights, access conditions, and licenses.
+Academic Repro is released under the [MIT License](LICENSE). Papers, datasets, third-party code, and generated artifacts retain their respective rights, access conditions, and licenses.

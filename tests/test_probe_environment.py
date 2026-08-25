@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import os
 import shlex
@@ -13,7 +14,25 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPT = REPO / "scirepro" / "scripts" / "probe_environment.py"
+SCRIPT = REPO / "academic-repro" / "scripts" / "probe_environment.py"
+
+
+def load_probe_module() -> object:
+    module_name = "academic_repro_probe_environment_under_test"
+    specification = importlib.util.spec_from_file_location(module_name, SCRIPT)
+    if specification is None or specification.loader is None:
+        raise RuntimeError(f"Cannot load probe module from {SCRIPT}")
+    module = importlib.util.module_from_spec(specification)
+    script_directory = str(SCRIPT.parent)
+    sys.path.insert(0, script_directory)
+    try:
+        specification.loader.exec_module(module)
+    finally:
+        sys.path.remove(script_directory)
+    return module
+
+
+PROBE_MODULE = load_probe_module()
 
 
 class ProbeEnvironmentTests(unittest.TestCase):
@@ -209,7 +228,8 @@ class ProbeEnvironmentTests(unittest.TestCase):
             self.assertIn("recognizable Python interpreter", completed.stderr)
 
     def test_probe_output_redacts_secrets_and_file_uris(self) -> None:
-        from scirepro.scripts.probe_environment import redact_text, run
+        redact_text = PROBE_MODULE.redact_text
+        run = PROBE_MODULE.run
 
         with tempfile.TemporaryDirectory() as temporary:
             workspace = Path(temporary) / "workspace"
@@ -234,7 +254,7 @@ class ProbeEnvironmentTests(unittest.TestCase):
 
     @unittest.skipUnless(os.name == "posix", "process-group termination requires POSIX")
     def test_probe_timeout_terminates_sigterm_ignoring_descendants(self) -> None:
-        from scirepro.scripts.probe_environment import run
+        run = PROBE_MODULE.run
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -267,7 +287,7 @@ class ProbeEnvironmentTests(unittest.TestCase):
 
     @unittest.skipUnless(os.name == "posix", "process-group termination requires POSIX")
     def test_successful_probe_cannot_leave_background_descendants(self) -> None:
-        from scirepro.scripts.probe_environment import run
+        run = PROBE_MODULE.run
 
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -776,7 +796,7 @@ class ProbeEnvironmentTests(unittest.TestCase):
             self.assertFalse(recommendation["substitutePrimaryEligible"])
 
     def test_missing_native_runtime_allows_only_a_declared_fallback_primary(self) -> None:
-        from scirepro.scripts.probe_environment import native_route_recommendation
+        native_route_recommendation = PROBE_MODULE.native_route_recommendation
 
         artifacts = [{"path": "$WORKSPACE/target_method.m", "suffix": ".m", "exists": True}]
         undeclared = native_route_recommendation(
@@ -803,7 +823,7 @@ class ProbeEnvironmentTests(unittest.TestCase):
         self.assertTrue(declared["pythonPrimaryEligible"])
 
     def test_portability_objective_can_select_julia_before_matlab_failure(self) -> None:
-        from scirepro.scripts.probe_environment import native_route_recommendation
+        native_route_recommendation = PROBE_MODULE.native_route_recommendation
 
         artifacts = [{"path": "$WORKSPACE/target_method.m", "suffix": ".m", "exists": True}]
         available_native = [{

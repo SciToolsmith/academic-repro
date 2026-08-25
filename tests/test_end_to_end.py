@@ -23,8 +23,8 @@ from tests.fixture_factory import write_json
 
 
 REPO = Path(__file__).resolve().parents[1]
-MATERIALIZER = REPO / "scirepro/scripts/materialize_target_figures.py"
-ASSEMBLER = REPO / "scirepro/scripts/assemble_delivery.py"
+MATERIALIZER = REPO / "academic-repro/scripts/materialize_target_figures.py"
+ASSEMBLER = REPO / "academic-repro/scripts/assemble_delivery.py"
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 

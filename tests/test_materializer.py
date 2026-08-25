@@ -24,7 +24,7 @@ except ImportError:  # pragma: no cover - clean-install CI supplies these
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPT = REPO / "scirepro/scripts/materialize_target_figures.py"
+SCRIPT = REPO / "academic-repro/scripts/materialize_target_figures.py"
 AUTO_PDFTOPPM = next(
     (path for path in (Path("/opt/homebrew/bin/pdftoppm"), Path("/usr/local/bin/pdftoppm"), Path("/usr/bin/pdftoppm")) if path.exists()),
     None,
@@ -32,7 +32,7 @@ AUTO_PDFTOPPM = next(
 
 
 def load_materializer_module():
-    specification = importlib.util.spec_from_file_location("scirepro_materializer_under_test", SCRIPT)
+    specification = importlib.util.spec_from_file_location("academic_repro_materializer_under_test", SCRIPT)
     if specification is None or specification.loader is None:
         raise RuntimeError("could not load materializer module")
     module = importlib.util.module_from_spec(specification)

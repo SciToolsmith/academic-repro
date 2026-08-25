@@ -12,5 +12,6 @@ venv/
 htmlcov/
 *.log
 .scirepro-work/
+.academic-repro-work/
 .*-reproduction.staging-*/
 *-reproduction/

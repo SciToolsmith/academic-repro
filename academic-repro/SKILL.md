@@ -1,9 +1,9 @@
 ---
-name: scirepro
+name: academic-repro
 description: Reproduce and scientifically assess data-derived research figures, quantitative result tables, and computation-generated structures from papers. Use when Codex should rebuild the smallest credible data-to-result process, test whether a replacement preserves the paper's local claim and visual semantics, or report an evidence-bounded blocker. Do not use for author-drawn explanatory schematics, general paper summaries, or styling-only edits.
 ---
 
-# SciRepro
+# Academic Repro
 
 Reproduce the evidence behind a target, not its pixels. The goal is the smallest transparent and rerunnable process that can credibly generate the target's scientific observables and support the same narrow local argument. Exact appearance is secondary unless it carries meaning or the user explicitly requests it.
 
@@ -11,9 +11,9 @@ Reproduce the evidence behind a target, not its pixels. The goal is the smallest
 
 Identify the target before choosing a tool or implementation:
 
-- **Computed result:** produced by measurement, simulation, equations, statistics, training, search, optimization, or another algorithm. This includes learned or searched architectures, optimized topologies, clustering trees, and other outputs that may look like schematics. Keep these in SciRepro.
+- **Computed result:** produced by measurement, simulation, equations, statistics, training, search, optimization, or another algorithm. This includes learned or searched architectures, optimized topologies, clustering trees, and other outputs that may look like schematics. Keep these in Academic Repro.
 - **Input or condition:** parameters, scenarios, configurations, or dataset descriptions used to generate results. Treat them as inputs unless their derivation is itself the target.
-- **Explanatory artifact:** an author-drawn theory, mechanism, process, or system diagram whose objects and arrows explain an idea rather than report a computational output. This is outside SciRepro; use [diagram-handoff.md](references/diagram-handoff.md) only if reconstruction is requested.
+- **Explanatory artifact:** an author-drawn theory, mechanism, process, or system diagram whose objects and arrows explain an idea rather than report a computational output. This is outside Academic Repro; use [diagram-handoff.md](references/diagram-handoff.md) only if reconstruction is requested.
 - **Image-only evidence:** pixels without enough paper, data, or method context. Reconstruct only what is identifiable; consult [image-derived-reconstruction.md](references/image-derived-reconstruction.md).
 
 Visual form alone never decides the route. A table may also be mixed: input columns define conditions, computed columns are reproduction targets, and qualitative literature or capability columns remain explanatory.
