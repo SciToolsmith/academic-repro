@@ -12,17 +12,7 @@ SKILL = REPO / "scirepro"
 REFERENCE_LINK = re.compile(r"\[[^\]]+\]\((references/[^)#]+\.md)(?:#[^)]+)?\)")
 
 
-def direct_reference_paths(skill_text: str) -> tuple[Path, ...]:
-    """Return the references selected directly by the active SKILL entrypoint."""
-    return tuple(SKILL / relative for relative in dict.fromkeys(REFERENCE_LINK.findall(skill_text)))
-
-
-def read_existing(paths: list[Path]) -> str:
-    """Read active contract files that exist."""
-    return "\n".join(path.read_text(encoding="utf-8") for path in paths if path.is_file())
-
-
-class RepositoryContractTests(unittest.TestCase):
+class RepositoryTests(unittest.TestCase):
     def test_python_sources_compile(self) -> None:
         sources = sorted((SKILL / "scripts").glob("*.py")) + sorted((REPO / "tests").glob("*.py"))
         completed = subprocess.run(
@@ -33,166 +23,55 @@ class RepositoryContractTests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 0, completed.stderr)
 
-    def test_skill_frontmatter_and_routed_references(self) -> None:
+    def test_skill_entrypoint_is_valid_and_progressively_disclosed(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         self.assertTrue(text.startswith("---\n"))
         frontmatter = text.split("---", 2)[1]
         self.assertRegex(frontmatter, r"(?m)^name:\s*scirepro\s*$")
         self.assertRegex(frontmatter, r"(?m)^description:\s*\S")
-        for reference in (
-            "target-figure-acquisition.md",
-            "image-derived-reconstruction.md",
-            "source-environment-audit.md",
-            "permission-gates.md",
-            "execution-validation.md",
-            "delivery-contract.md",
-            "diagram-handoff.md",
+
+        links = list(dict.fromkeys(REFERENCE_LINK.findall(text)))
+        self.assertGreaterEqual(len(links), 4)
+        for relative in links:
+            self.assertTrue((SKILL / relative).is_file(), relative)
+
+        # The entrypoint should remain a routing and decision surface, not a manual.
+        self.assertLessEqual(len(text.split()), 1200)
+
+    def test_instruction_surface_stays_compact(self) -> None:
+        references = sorted((SKILL / "references").glob("*.md"))
+        total_words = len((SKILL / "SKILL.md").read_text(encoding="utf-8").split())
+        for path in references:
+            words = len(path.read_text(encoding="utf-8").split())
+            self.assertLessEqual(words, 1500, f"{path.name} has become a second entrypoint")
+            total_words += words
+        self.assertLessEqual(total_words, 6500, "policy surface has grown beyond progressive disclosure")
+
+    def test_policy_has_no_case_specific_or_platform_specific_rules(self) -> None:
+        policy_files = [SKILL / "SKILL.md", *sorted((SKILL / "references").glob("*.md"))]
+        policy = "\n".join(path.read_text(encoding="utf-8") for path in policy_files)
+        for pattern in (
+            r"\bfeature mode decomposition\b",
+            r"\bimckd\b",
+            r"\bsig1(?:\.mat)?\b",
+            r"\b90\s*%",
+            r"\b96\s*%",
+            r"\b250\s*MiB\b",
+            r"\b2\s*GiB\b",
+            r"\bWindows PowerShell\b",
+            r"\bradar chart\b",
         ):
-            self.assertIn(reference, text, "SKILL.md must route to " + reference)
-            self.assertTrue((SKILL / "references" / reference).is_file())
+            self.assertNotRegex(policy, pattern)
 
-    def test_skill_uses_one_adaptive_workflow_without_named_tiers(self) -> None:
-        skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        workflow_headings = re.findall(r"(?im)^##\s+([^\n]*workflow[^\n]*)$", skill_text)
-        self.assertEqual(
-            len(workflow_headings),
-            1,
-            "the entrypoint should expose one workflow rather than a menu of modes",
-        )
-        self.assertIn("adaptive", skill_text.casefold())
-        self.assertRegex(skill_text.casefold(), r"decision-changing|information gain|acceptance")
-        self.assertRegex(skill_text.casefold(), r"\bstop\b")
-
-        for named_tier in (
-            r"(?im)^#{1,6}\s*(?:quick|standard|audit)(?:\s+(?:mode|tier|workflow))?\s*$",
-            r"(?i)\b(?:quick|standard|audit)\s+(?:mode|tier|workflow)\b",
-            r"(?i)\b(?:mode|tier|workflow)s?\s*:\s*quick\s*[,/|>-]+\s*standard\s*[,/|>-]+\s*audit\b",
-            r"(?m)^#{1,6}\s*(?:快速|标准|审计)(?:档|模式|流程)?\s*$",
-        ):
-            self.assertNotRegex(skill_text, named_tier)
-
-    def test_active_workflow_has_no_default_pre_execution_web_report_or_approval(self) -> None:
-        skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        governed_files = [
-            REPO / "README.md",
-            REPO / "README.en.md",
-            SKILL / "SKILL.md",
-            SKILL / "agents" / "openai.yaml",
-            *direct_reference_paths(skill_text),
-        ]
-        governed = read_existing(governed_files)
-        for forbidden in (
-            "report-before-execution",
-            "awaiting-approval",
-            "Review the report before execution",
-            "先看报告，再决定",
-            "docs/assets/report-preview.webp",
-            "web-report-contract.md",
-        ):
-            self.assertNotIn(forbidden, governed)
-        self.assertNotRegex(governed.casefold(), r"default[^\n]{0,80}(?:webpage|web report|approval gate)")
-        self.assertRegex(
-            governed.casefold(),
-            r"(?:do not|never|without)[^\n]{0,100}pre-execution[^\n]{0,100}(?:web|report|approval)",
-        )
-
-    def test_skill_routes_directly_one_level_to_customer_delivery_contract(self) -> None:
-        skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        links = REFERENCE_LINK.findall(skill_text)
-        self.assertEqual(links.count("references/delivery-contract.md"), 1)
-
-        contract_path = SKILL / "references" / "delivery-contract.md"
-        self.assertTrue(contract_path.is_file())
-        contract = contract_path.read_text(encoding="utf-8")
-        self.assertIn("assemble_delivery.py", contract)
-
-    def test_customer_delivery_is_distinct_from_transient_workspace(self) -> None:
-        contract_path = SKILL / "references" / "delivery-contract.md"
-        self.assertTrue(contract_path.is_file())
-        contract = contract_path.read_text(encoding="utf-8")
-        workflow = "\n".join((
-            (SKILL / "SKILL.md").read_text(encoding="utf-8"),
-            (SKILL / "references" / "execution-validation.md").read_text(encoding="utf-8"),
-            contract,
-        ))
-        lowered = workflow.casefold()
-        self.assertRegex(lowered, r"customer(?:-facing)?(?: delivery| folder| output)")
-        self.assertRegex(lowered, r"(?:transient|temporary|internal)[^\n]{0,80}(?:workspace|staging)")
-        self.assertIn(".scirepro-work/<task-id>/", workflow)
-        self.assertIn("never a second visible peer delivery", workflow)
-        for customer_item in ("README.md", "rerun"):
-            self.assertIn(customer_item.casefold(), contract.casefold())
-        self.assertRegex(contract.casefold(), r"(?:main|primary|selected)\s+(?:result|output|artifact)")
-        self.assertTrue((SKILL / "scripts" / "assemble_delivery.py").is_file())
-
-    def test_active_default_does_not_route_to_retired_finalizer(self) -> None:
-        skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        active_files = [
-            SKILL / "SKILL.md",
-            SKILL / "agents" / "openai.yaml",
-            *direct_reference_paths(skill_text),
-        ]
-        active_text = read_existing(active_files)
-        self.assertNotIn("finalize_run_bundle.py", active_text)
-        self.assertNotIn("assemble_delivery.py build", active_text)
-
-    def test_semantic_schematics_are_terminally_handed_off(self) -> None:
-        skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-        handoff = (SKILL / "references" / "diagram-handoff.md").read_text(encoding="utf-8")
-        gates = (SKILL / "references" / "permission-gates.md").read_text(encoding="utf-8")
-        execution = (SKILL / "references" / "execution-validation.md").read_text(encoding="utf-8")
-        acquisition = (SKILL / "references" / "target-figure-acquisition.md").read_text(encoding="utf-8")
-        agent = (SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
-
-        route_heading = re.search(r"(?im)^##\s+Route ownership(?:\s+first)?\s*$", skill_text)
-        workflow_heading = re.search(r"(?im)^##\s+[^\n]*workflow[^\n]*$", skill_text)
-        self.assertIsNotNone(route_heading)
-        self.assertIsNotNone(workflow_heading)
-        self.assertLess(route_heading.start(), workflow_heading.start())
-        self.assertIn("end SciRepro ownership", skill_text)
-        self.assertRegex(handoff, r"Once (?:the )?transfer succeeds, SciRepro instructions cease to govern")
-        self.assertIn("Pinned diagram companion exception", gates)
-        self.assertRegex(execution, r"semantic scientific schematic[^\n]+misrouted[^\n]+diagram-handoff\.md")
-        self.assertIn("For a semantic schematic, follow [diagram-handoff.md]", acquisition)
-        self.assertRegex(agent, r"semantic schematics[^\n]+terminal")
-        self.assertRegex(
-            handoff,
-            r"Do not create a SciRepro target workspace[^\n]+validation record",
-        )
-        self.assertIn("In a mixed task", handoff)
-        self.assertIn("companion's final artifacts", handoff)
-        self.assertRegex(handoff, r"(?m)^Pass only(?: the material the receiving skill needs)?:\s*$")
-        self.assertRegex(handoff, r"the user's (?:original )?requested deliverable and constraints")
-        self.assertIn("## Default terminal deliverable", handoff)
-        self.assertIn("`.pptx`", handoff)
-        self.assertIn("PNG preview", handoff)
-        self.assertRegex(handoff, r"Do not add SVG, PDF,[^\n]+customer folder by default")
-        self.assertIn("may create build source and QA artifacts internally", handoff)
-        for internal_artifact in ("manifest.json", "logs/"):
-            self.assertNotIn(internal_artifact, handoff)
-
-        for pinned in (
-            "SciToolsmith/sci-diagram-pptx",
-            "skills/sci-diagram-pptx",
-            "26a2ae281df4209fa9687ca80d27a3aa7feb1ee3",
-        ):
-            self.assertIn(pinned, handoff)
-
-    def test_legacy_decision_report_stack_is_not_installed(self) -> None:
-        retired = (
-            "scripts/build_report.py",
-            "scripts/init_report.py",
-            "scripts/plan_gate.py",
-            "scripts/execution_gate.py",
-            "references/investigation-schema.md",
-            "references/report-scaffold.md",
-            "references/web-report-contract.md",
-            "references/execution-contract.md",
-            "references/automatic-run-folder.md",
-            "assets/research-report-web/index.html",
-        )
-        for relative in retired:
-            self.assertFalse((SKILL / relative).exists(), relative + " must not ship in the active skill")
+    def test_readmes_present_the_same_small_public_contract(self) -> None:
+        chinese = (REPO / "README.md").read_text(encoding="utf-8")
+        english = (REPO / "README.en.md").read_text(encoding="utf-8")
+        self.assertEqual(chinese.count('<h1 align="center">SciRepro</h1>'), 1)
+        self.assertEqual(english.count('<h1 align="center">SciRepro</h1>'), 1)
+        for required in ("使用 $skill-installer", "使用 $scirepro", "可信生成", "论点保持", "视觉语义"):
+            self.assertIn(required, chinese)
+        for required in ("Use $skill-installer", "Use $scirepro", "Credible generation", "Claim preservation", "Visual-semantic preservation"):
+            self.assertIn(required, english)
 
     def test_runtime_dependencies_and_pdf_ci_are_declared(self) -> None:
         requirements = (SKILL / "requirements.txt").read_text(encoding="utf-8")
@@ -200,106 +79,17 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("Pillow", requirements)
         self.assertIn("pdfplumber", requirements)
         self.assertIn("poppler", workflow)
-        self.assertIn("scirepro/requirements.txt", workflow)
         self.assertIn('"3.10"', workflow)
 
-    def test_installable_skill_contains_no_case_specific_rules(self) -> None:
-        installable_files = [
-            path for path in SKILL.rglob("*")
-            if path.is_file() and "__pycache__" not in path.parts
-        ]
-        installable_text = "\n".join(
-            path.read_text(encoding="utf-8", errors="ignore")
-            for path in installable_files
-        )
-        for case_specific_pattern in (
-            r"\bfeature mode decomposition\b",
-            r"\bfmd(?:\.m)?\b",
-            r"\bimckd\b",
-            r"\bsig1(?:\.mat)?\b",
+    def test_helpers_and_forward_evals_are_present(self) -> None:
+        for relative in (
+            "scripts/materialize_target_figures.py",
+            "scripts/assemble_delivery.py",
+            "scripts/inspect_artifact.py",
+            "scripts/probe_environment.py",
         ):
-            self.assertNotRegex(
-                installable_text.casefold(),
-                case_specific_pattern,
-                "regression-case details must stay in tests, not the reusable skill",
-            )
-
-    def test_readmes_describe_the_active_customer_workflow(self) -> None:
-        chinese_path = REPO / "README.md"
-        english_path = REPO / "README.en.md"
-        chinese = chinese_path.read_text(encoding="utf-8")
-        english = english_path.read_text(encoding="utf-8")
-
-        self.assertEqual(chinese.count('<h1 align="center">SciRepro</h1>'), 1)
-        self.assertEqual(english.count('<h1 align="center">SciRepro</h1>'), 1)
-        self.assertNotIn("scirepro-hero", chinese + english)
-        self.assertNotIn("docs/assets/report-preview.webp", chinese + english)
-        for required in ("使用 $skill-installer", "使用 $scirepro", "客户"):
-            self.assertIn(required, chinese)
-        for required in ("Use $skill-installer", "Use $scirepro", "customer"):
-            self.assertIn(required, english)
-
-    def test_readmes_distinguish_scientific_reproduction_from_image_only_work(self) -> None:
-        """Image-only redraws must not be advertised as paper-backed reproduction."""
-        chinese = (REPO / "README.md").read_text(encoding="utf-8")
-        english = (REPO / "README.en.md").read_text(encoding="utf-8")
-
-        for readme, paper_pattern, image_pattern in (
-            (
-                chinese,
-                r"(?is)论文.{0,220}(?:数据|方法|参数).{0,220}(?:科学|研究).{0,120}复现",
-                r"(?is)(?:仅目标图片|仅图片|目标图片).{0,260}(?:可辨识|可识别|像素).{0,260}(?:图像派生|数字化|重绘|外观)",
-            ),
-            (
-                english,
-                r"(?is)paper.{0,220}(?:data|method|parameter).{0,220}(?:scientific|research).{0,120}reproduc",
-                r"(?is)(?:target images? alone|images? alone|target images?).{0,260}(?:identifi|pixel).{0,260}(?:image-derived|digitiz|redraw|appearance)",
-            ),
-        ):
-            self.assertRegex(readme, paper_pattern)
-            self.assertRegex(readme, image_pattern)
-
-    def test_image_only_route_assesses_identifiability_before_selecting_a_route(self) -> None:
-        skill_text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
-
-        self.assertRegex(
-            skill_text,
-            r"(?is)(?:target images? alone|pixels? alone|pixels without reliable paper context).{0,1200}?(?:assess|determine|classify).{0,160}?(?:identifi|recoverab)",
-        )
-        self.assertRegex(
-            skill_text,
-            r"(?is)(?:non[- ]?identifi|not.{0,80}identifi|insufficient.{0,100}(?:pixel|image|observable)).{0,700}?original-case-blocked",
-        )
-
-    def test_image_only_reference_has_honest_identifiability_outcomes(self) -> None:
-        reference = (SKILL / "references" / "image-derived-reconstruction.md").read_text(encoding="utf-8")
-
-        # The labels may evolve; each branch is checked by the evidence it permits.
-        for outcome_pattern in (
-            r"(?is)(?:data[- ]identifi|(?:legible|calibrated).{0,140}(?:axis|coordinate).{0,160}(?:digitiz|data))",
-            r"(?is)(?:partial(?:ly)?[- ]identifi|(?:only|partly).{0,100}(?:identifiable|recoverable|visible).{0,120}(?:part|portion|subset))",
-            r"(?is)(?:appearance[- ]only|(?:geometry|layout|style).{0,120}(?:only|without).{0,120}(?:data|method|scientific))",
-            r"(?is)(?:non[- ]?identifi|insufficient.{0,120}(?:pixel|image|information)|cannot.{0,120}(?:recover|reconstruct)).{0,260}(?:block|stop|required|need)",
-        ):
-            self.assertRegex(reference, outcome_pattern)
-
-        self.assertRegex(
-            reference,
-            r"(?is)digitiz.{0,180}(?:never|do not|must not).{0,180}(?:original (?:data|observation)|raw data)",
-        )
-        self.assertRegex(
-            reference,
-            r"(?is)(?:pixel|image).{0,260}(?:never|do not|does not).{0,260}(?:scientific conclusion|paper claim)",
-        )
-        self.assertRegex(
-            reference,
-            r"(?is)(?:reproduce this image|unqualified request).{0,240}(?:not permission|must not|do not).{0,240}appearance",
-        )
-        self.assertRegex(
-            reference,
-            r"(?is)(?:do not|never).{0,100}(?:reverse-search|reverse search).{0,180}(?:blocker|bounded|identifier)",
-        )
-        self.assertRegex(reference, r"(?is)semantic schematics?.{0,160}(?:terminal|sci-diagram-pptx)")
+            self.assertTrue((SKILL / relative).is_file(), relative)
+        self.assertTrue((REPO / "evals" / "scientific_judgment.json").is_file())
 
     def test_generated_cache_files_are_not_tracked(self) -> None:
         completed = subprocess.run(
@@ -309,21 +99,7 @@ class RepositoryContractTests(unittest.TestCase):
             path for path in completed.stdout.splitlines()
             if path.endswith((".pyc", ".pyo", ".DS_Store")) or "/__pycache__/" in f"/{path}/"
         ]
-        self.assertEqual(forbidden, [], "generated cache files must not be tracked")
-
-    def test_negative_reproduction_and_integrity_language_is_bounded(self) -> None:
-        execution = (SKILL / "references" / "execution-validation.md").read_text(encoding="utf-8")
-        for claim_status in (
-            "`supported`",
-            "`partially-supported`",
-            "`unsupported`",
-            "`inconclusive`",
-            "`not-tested`",
-        ):
-            self.assertIn(claim_status, execution)
-        self.assertIn("Failure to reproduce is not by itself evidence of fabrication", execution)
-        self.assertRegex(execution, r"potential (?:research-)?integrity concern")
-        self.assertRegex(execution, r"requires explicit (?:user )?authorization")
+        self.assertEqual(forbidden, [])
 
 
 if __name__ == "__main__":

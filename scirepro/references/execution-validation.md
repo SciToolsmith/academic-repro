@@ -1,84 +1,49 @@
 # Execution and validation
 
-Execute the selected route as a scientific test of declared observables. A successful command is not sufficient validation, and image similarity is not independent evidence for a paper claim.
+Run the smallest transparent experiment that can test the target's local paper claim. A successful command is not validation, and visual similarity is not independent scientific evidence.
 
-## Prepare the transient run
+## Choose the strongest minimal route
 
-- Work inside one dedicated, create-only internal workspace under system temporary storage or a hidden `.scirepro-work/<task-id>/` root. Never place it beside the customer folder as a second visible delivery. Preserve supplied originals read-only and keep target acquisition, search notes, probes, intermediate code, raw logs, QA, and manifests there.
-- Freeze internally the target identity, selected route and scientific scope, actual source/input/configuration, implementation and runtime by target-producing stage, parameters or seeds, acceptance criteria, permitted effects, resource declarations, and intended customer deliverables. Do not use an input-stage gap as the reason to replace a separately usable author-native method stage.
-- Treat declared resource caps as planning authority, not enforcement evidence. Record internally which limits were enforced and which resources were measured.
-- Trace only the target-relevant executable chain: input and selection, preprocessing/calibration, method/model, aggregation/statistics, and visual encoding. Mark material stages reproduced, substituted, derived, assumed, uncovered, or not required.
-- Ask only when a genuinely new route, scientific choice, or authority decision appears. Normal reads and commands, harmless formatting changes, and evidence-preserving compatibility fixes inside the chosen step need no separate justification; expansion beyond that step still passes the global cost governor.
+- **Direct recomputation:** use verified author data, code, and relevant environment when exact workflow recovery is required and available.
+- **Mechanism reproduction:** implement the reported equations, physical mechanism, training procedure, or algorithm with explicit assumptions. This is usually sufficient for claim-equivalent reproduction.
+- **Alternative validation:** use a declared substitute implementation, dataset, or experiment to test a narrower transferable claim.
+- **Image-derived reconstruction:** test only digitization, geometry, appearance, or editability; do not make a mechanism claim.
+- **Blocked:** stop the affected claim when a material input or method is unavailable and no credible narrower route exists.
 
-Do not initialize the customer folder before useful persistent results exist. Do not create a pre-execution webpage, contract, approval receipt, or gate artifact.
+Do not require the author's original software merely because it may have been used. Require it when its behavior is claim-defining or the user requests the native artifact. Otherwise prefer the simplest executable mechanism that preserves the evidence relationship.
 
-## Execute the honest route
+## Resolve only consequential unknowns
 
-- `direct-recompute`: use verified original or official input and implementation. Do not use it when input identity is only probable.
-- `mechanism-reproduction`: reconstruct the reported mechanism from code, equations, and transparent assumptions; validate the phenomenon it is meant to produce.
-- `alternative-validation`: use a declared substitute dataset, implementation, or experiment to test a narrower transferable claim.
-- `image-derived-reconstruction`: validate only the declared visual, geometric, digitization, or editability objective.
-- `original-case-blocked`: do not fabricate missing input or method. Preserve the blocker and lawful reopening condition.
+Resolve, derive, or bound an unknown when plausible choices could change an observable or conclusion. Use a defensible documented assumption when it is consequential but not claim-defining, and fix incidental choices reproducibly. Never select parameters, seeds, runs, or inputs because they look most like the published image.
 
-Verify formulas and parameters only as far as the target and acceptance decision require. Preserve derivations, ambiguities, and material paper-code differences. A semantic scientific schematic that reaches execution was misrouted; return it to [diagram-handoff.md](diagram-handoff.md) without creating a SciRepro result for that target.
+If a visible feature is used to calibrate an assumption, it cannot also serve as independent validation. Validate another observable or narrow the conclusion to a calibrated reconstruction.
 
-## Handle unknowns by scientific consequence
+## Apply three acceptance gates
 
-The role of an unknown is target-dependent. Classify it by whether plausible choices can change a declared observable, acceptance decision, or supported claim:
+A scientific target passes only when all applicable gates pass:
 
-- **Claim-defining or otherwise material:** resolve, derive, or bound it. If plausible choices could reverse the conclusion, use the smallest discriminating comparison; block only the requested claim that still depends on unavailable information.
-- **Nuisance but consequential:** choose a value constrained by the paper, author code, visible observables, or a defensible domain convention, mark it `assumed`, and test a small alternative only when acceptance could change.
-- **Incidental:** fix a non-critical seed, another reproducible value, or a reasonable presentation choice once and continue. Do not search for the author's exact seed or realization when it cannot affect the scientific decision.
+1. **Credible generation:** the result comes from a transparent executable chain of data, equations, simulation, training, or algorithmic computation rather than image fitting or manual shaping.
+2. **Claim preservation:** replacing the published target with the reproduced result would still support the narrow proposition made by its caption and local discussion, within the declared evidence route.
+3. **Visual-semantic preservation:** the figure or table retains the form needed to understand and compare the evidence.
 
-Choose assumptions before final comparison where practical and state their basis and claim boundary. Never describe an assumption as recovered from the authors, tune it solely for visual resemblance, or select seeds, inputs, runs, or parameter combinations because they look favorable. Multiple plausible assumptions producing the same declared phenomenon can support a mechanism result; materially conflicting outcomes require a bounded sensitivity check or an inconclusive conclusion.
+Exact pixels, random realization, typography, and every reported value need not match unless the claim depends on them. Trends, ordering, thresholds, magnitudes, uncertainty, or robustness become material when the local argument explicitly relies on them.
 
-Treat any target feature used to estimate, select, or calibrate an assumed parameter as calibration evidence, not independent validation. Validate on another predeclared observable, held-out region or condition, or an external constraint; when none exists, narrow the claim to a calibrated reconstruction or mark the scientific test inconclusive.
+## Give thresholds a scientific basis
 
-## Define acceptance
+Acceptance criteria take authority from, in order: an explicit paper claim, an explicit user requirement, a method-validity condition, or a defensible domain check. Freeze justified criteria before inspecting final outputs where practical.
 
-For scientific reproduction, evaluate in this order when relevant:
+A convenient or previously declared number has no scientific authority by itself. Similarity scores and arbitrary benefit-retention targets may be useful diagnostics, but missing them is not a scientific failure unless one of the authorities above makes that boundary material.
 
-1. variables, samples, units, axes, scales, and domain;
-2. qualitative phenomenon, topology, modes, peaks, ordering, or trend;
-3. quantitative values and uncertainty within justified tolerance;
-4. robustness only when the claim or negative interpretation depends on it;
-5. visual encoding and presentation needed to preserve meaning and readability.
+## Preserve comparison semantics
 
-Set tolerances before inspecting final outputs where practical. For image-derived work, validate only identifiable coordinate calibration, geometry/topology, annotations, panels, appearance, or editability, including uncertainty from resolution, marks, occlusion, compression, and antialiasing.
+Preserve chart family, panel structure, axes and orientation, units, scale, grouping, normalization, legend mapping, and reference marks when they carry the argument. Do not change the chart family, collapse comparative panels, or reverse an axis when that changes how the evidence is read. Palette, fonts, spacing, and line widths are secondary unless explicitly requested.
 
-## Reach the first useful V0
+For related targets, reuse controls that the experiment holds fixed and preserve the intended levels of varied factors. Isolate target-specific failures. A shared upstream failure propagates only to targets that depend on it. Panels may run separately, but validate them jointly when the caption's claim depends on their comparison.
 
-Produce and preserve the first scientifically meaningful output as V0 as soon as the route is defensible. Do not delay V0 for broad source archaeology, exhaustive environment inventory, speculative parameter search, or cosmetic planning.
+## Stop and report honestly
 
-For a small local target whose actual computation is expected to take seconds or minutes, aim to reach the first honest V0 within roughly 10–15 minutes. Treat this as a planning checkpoint, not a universal deadline. If it passes without V0, stop expanding investigation and either run the strongest defensible route or state the concrete blocker.
+Run only the smallest sensitivity check that could change acceptance. Stop when the three gates pass, remaining differences do not affect the claim, or another iteration would only chase pixels. Also stop when the next action cannot materially reduce uncertainty or when a material blocker remains.
 
-Compare V0 at two levels:
+Report execution, validation, and scientific interpretation separately. Use `supported`, `partially supported`, `unsupported`, `inconclusive`, or `not tested`; image-only work has no scientific-claim status. A crash, missing dependency, absent input, or incomplete test is inconclusive or blocked—not evidence that the paper is false.
 
-- scientific: variables, units, scale, trends, peaks, extrema, ordering, magnitude, uncertainty, and relevant robustness;
-- presentation: fix semantic encoding, overlap, clipping, contrast, or unreadable labels when needed; treat exact palette, typography, spacing, and rendering details as secondary unless the declared objective makes them material.
-
-Once the scientific content is stable, correct only presentation defects that hide or misstate it. Stop when the figure communicates the accepted observables clearly; do not reopen scientific tuning merely to improve cosmetic resemblance.
-
-Diagnose each material discrepancy. Before expanding investigation with another search branch, subagent, broad probe, or additional scientific run, name internally the unknown or hypothesis and how its answer can change the route, claim, safety, material cost, or required deliverable. This branch-level check needs no ledger, artifact, or user-facing narration. Record scientifically meaningful changes and predictions internally; do not preserve unnecessary cosmetic versions.
-
-Run sensitivity analysis only when acceptance of the claim or interpretation of a negative result depends on stability across seeds, perturbations, parameters, or numerics. Use the smallest design that can answer that question; do not run a default grid.
-
-Stop when criteria pass, remaining differences are non-critical, another action would only chase pixels, repeated tests add no explanation, or expected information gain no longer justifies cost or risk. There is no fixed universal iteration count.
-
-## Interpret results honestly
-
-Report operational, validation, and claim states independently. Use `supported`, `partially-supported`, `unsupported`, `inconclusive`, or `not-tested` for scientific claims; image-derived work uses `not-applicable`. `Unsupported` requires a valid implementation and test that actually exercises the claim. A crash, missing input, or absent validation does not establish an unsupported claim.
-
-Preserve negative results, contrary outputs, informative failed attempts, relevant sensitivity evidence, and remaining uncertainty. Before interpreting an anomaly, check only relevant data identity, implementation trace, units, preprocessing, parameters, seeds, numerical behavior, environment, and plotting transforms. Do not search indefinitely for favorable settings.
-
-Failure to reproduce is not by itself evidence of fabrication. Record a potential integrity concern only when a specific anomaly is independently repeatable and relevant ordinary differences have been actively tested without explaining it. State facts and uncertainty neutrally; contacting authors, journals, or other third parties requires explicit authorization.
-
-## Assemble the customer folder
-
-After execution, use [delivery-contract.md](delivery-contract.md) to plan and assemble exactly one customer folder from the transient workspace. Invoke `python <skill-root>/scripts/assemble_delivery.py --plan <plan.json> --output-root <parent>` only after the delivery plan names a fresh minimum whitelist. Treat the folder as a finished result plus its necessary production materials, not as evidence of Codex's work. Include the primary result; the actual final code or editable source that produces it; files that code really reads and cannot regenerate, including required configuration, data, model weights, checkpoints, calibration files, or vocabularies; the minimum environment/dependency declaration; required licenses; and a short README. Do not add empty conventional directories.
-
-The README is not an audit report. State the result, one exact rerun command, required inputs and dependencies, and only assumptions, limitations, substitutions, or rights that materially affect interpretation or reuse. If a required input or model is too large, access-controlled, or not redistributable, give a stable lawful acquisition method, exact version, and checksum when available; do not imply that the delivery is self-contained.
-
-Make the final program produce only the primary customer result by default. Put diagnostics, validation exports, regenerated tables, intermediate figures, and debugging output behind explicit options when they remain useful. For every package described as rerunnable, create a clean staging copy containing exactly the proposed customer files, execute the documented command there, and inspect both the result and resulting directory. Reject hidden dependencies on the transient workspace, absolute local paths, caches, undeclared environment state, or omitted inputs, and remove incidental files created by the default run. Keep the clean-run logs and inspection records internal.
-
-Do not expose raw search traces, broad environment inventories, runtime/license probe records, validation JSON, QA overlays, internal manifests, debugging logs, iteration traces, sensitivity details, middleware metadata, redundant attempts, V0, reference crops, or regenerated tables as customer deliverables by default. Summarize a material fact in the README or promote one purpose-built extra only when the user requested it or it has independent downstream value. Keep multi-target outcomes isolated so one target's failure cannot alter another's result. When blocked work has no persistent result or reusable continuation material, answer in chat instead of manufacturing a folder.
+After validation, follow [delivery-contract.md](delivery-contract.md). Deliver the primary result, the code and indispensable inputs that regenerate it, a minimal dependency declaration, and a short README with one rerun command and only interpretation-relevant assumptions or limitations. Keep searches, probes, intermediate versions, QA artifacts, raw logs, and internal records out of the customer folder unless independently useful and explicitly requested.
