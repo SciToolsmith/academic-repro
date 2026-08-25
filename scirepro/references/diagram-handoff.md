@@ -1,61 +1,30 @@
-# Terminal schematic handoff
+# Explanatory-diagram handoff
 
-Use this reference after a target is identified as a scientific semantic schematic. This is a terminal transfer to `sci-diagram-pptx`, not a SciRepro reproduction route.
+Use this reference only after classifying the target by **how it was produced and what evidence role it plays**. Visual form alone never decides ownership.
 
-## Classify the target
+## Keep computed structures in SciRepro
 
-Hand off algorithm flowcharts, scientific workflows, technical routes, mechanism diagrams, system/model architectures, block diagrams, and conceptual schematics when meaning is encoded mainly by labelled objects, connectors, direction, grouping, nesting, containment, or topology.
+A target remains a SciRepro result when its nodes, links, topology, hierarchy, or layout were produced by an executable scientific process whose outcome is being reproduced. This includes, for example:
 
-Keep quantitative plots in SciRepro when meaning is encoded mainly by axes, scales, legends, samples, measurements, or data-driven geometry, even when callouts or explanatory boxes are present.
+- architectures found by neural architecture search;
+- trees produced by clustering or inference;
+- topologies selected by optimization;
+- model structures that change as a reported result of training, pruning, or adaptation.
 
-- Treat a process canvas containing a small photograph, spectrum, screenshot, or formula as one schematic; the receiver decides whether that content remains a raster inset.
-- Route clearly separable peer panels independently while preserving parent figure and panel identity. Exclude transferred panels from SciRepro scientific execution and validation.
-- Ask one concise scope question only when the panel boundary or required artifact is genuinely decision-changing. Do not begin SciRepro execution while waiting.
+Such targets may look like schematics, but their structure is data. Reproduce the generating search, training, optimization, or algorithm and validate the resulting scientific claim.
 
-## Acquire only what transfer needs
+## Hand off explanatory drawings
 
-When only a paper and figure reference are available, obtain the minimum readable target required by the receiver. Preserve the original upload or paper locator, figure/panel label, page, complete caption, and traceable crop/bounds. Read nearby text or equations only when they disambiguate visible wording, a target-relevant formula, arrow direction, grouping, or the selected panel.
+Hand off only author-drawn theory, mechanism, process, workflow, route, circuit, or conceptual diagrams whose scientific content is an explanation rather than the output of the computation under study. The appropriate objective is then faithful, editable reconstruction, not experimental recomputation.
 
-Do not create a SciRepro target workspace, execution route, or validation record for the schematic. When every requested target is transferred, the companion owns its delivery and SciRepro creates no separate customer folder. In a mixed task, the task coordinator may later place only the companion's final artifacts in the common customer folder; SciRepro must not reinterpret or revalidate them. Do not continue source archaeology after the receiver has enough context.
+When `sci-diagram-pptx` is available, transfer that target there. Do not create a SciRepro execution result merely to redraw it.
 
-## Ensure the pinned companion
+For a mixed figure, classify panels separately when their boundaries and captions make them independent. A computed panel stays in SciRepro; an explanatory panel may be handed off. Preserve the parent figure and panel identity in both routes.
 
-Run:
+## Transfer only necessary context
 
-```bash
-python <skill-root>/scripts/ensure_diagram_companion.py
-```
+Pass the unchanged target image or traceable crop, paper locator, figure and panel label, complete caption, and only the nearby text needed to understand wording, formulas, grouping, and connector meaning. Also pass the user's requested format and editability constraints.
 
-This standing exception may install only the user-level Codex skill from:
+Do not transfer source-search history, runtime probes, SciRepro validation records, manifests, or delivery machinery. Once the explanatory target is accepted by the receiving skill, SciRepro no longer validates it.
 
-- repository: `SciToolsmith/sci-diagram-pptx`;
-- path: `skills/sci-diagram-pptx`;
-- commit: `26a2ae281df4209fa9687ca80d27a3aa7feb1ee3`;
-- method: anonymous public download through the system `skill-installer`.
-
-Do not ask merely because the valid destination is absent. Do not follow `main`, search for substitutes, use credentials, overwrite an existing destination, or install Python, Node, Office, LibreOffice, fonts, system packages, or companion runtime dependencies. Reuse a valid existing installation without modification and report it as user-managed. On conflict, missing installer, download failure, or failed validation, report the concrete blocker and stop rather than returning to SciRepro.
-
-After installation or validation, read the companion's `SKILL.md` completely and only the references it directly routes to. Continue under `sci-diagram-pptx` in the same task.
-
-## Transfer minimal ownership
-
-Pass only:
-
-- the unchanged uploaded target or traceable full-figure crop;
-- selected panel bounds when applicable;
-- paper path or DOI, figure/panel label, page, and complete caption when known;
-- minimum nearby context needed for visible wording, formulas, connector semantics, and scientific meaning;
-- the user's requested deliverable and constraints.
-
-Pass no SciRepro route, environment probes, source-search history, validation machinery, internal manifests, or delivery structure. Once transfer succeeds, SciRepro instructions cease to govern that target.
-
-The receiver may return a target once only when it determines that meaning is actually encoded by quantitative axes, scales, or data-driven geometry. Resolution, unreadable text, runtime availability, or PPTX authoring difficulty are not reasons to return ownership.
-
-## Default terminal deliverable
-
-When the user does not specify a format, request these customer-facing artifacts from the companion:
-
-- one native editable PowerPoint (`.pptx`) containing the reconstructed schematic; and
-- one PNG preview of the same final result for immediate inspection.
-
-Do not add SVG, PDF, or multiple stylistic variants to the customer folder by default. The companion may create build source and QA artifacts internally under its own Skill contract; promote executable build source only when the user explicitly requests it and it is cleanly reproducible outside transient middleware: dependencies and commands are documented, local paths and internal tool metadata are removed, and the generated PPTX and preview have been verified. A user-requested downstream format or presentation context overrides the default.
+Return a target to SciRepro only when later evidence shows that the displayed structure was itself generated by a computation being reproduced. Resolution, authoring difficulty, or the mere presence of boxes and arrows is not a reason to change ownership.

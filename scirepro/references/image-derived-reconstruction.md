@@ -1,65 +1,34 @@
 # Image-derived reconstruction
 
-Use `image-derived-reconstruction` when supplied target images lack reliable paper context. This is not research-process reproduction: reconstruct only content identifiable from pixels, and do not imply recovery or validation of the original data, method, experiment, or paper claim. If reliable paper context later establishes identity, create a new target and route rather than silently upgrading the result.
+Use this route when the supplied image is the only reliable source for the requested artifact. It can recover visible geometry or approximate plotted values; it cannot recover the original experiment. If paper context, source data, or code later becomes available, reassess the target instead of silently upgrading a pixel-derived result into scientific recomputation.
 
 ## Scope
 
-Depending on the user's objective and visible evidence, reconstruct:
+Image-derived work may produce calibrated data points, a partial redraw, editable vector artwork, rerunnable plotting code based on digitized values, or an appearance reconstruction. Keep each recovered value traceable to visible marks and state material uncertainty.
 
-- panel layout, axes, ticks, legends, annotations, colors, typography, and relative geometry;
-- visible curves, points, bars, contours, boundaries, or regions with stated uncertainty;
-- approximate data series through calibrated digitization;
-- rerunnable plotting code, editable vectors, or appearance/layout reconstruction.
+Do not classify a target from appearance alone. A learned architecture, searched cell, optimized topology, clustering tree, or other computational output remains a SciRepro target even when it consists of boxes, nodes, and arrows. With pixels alone, such provenance may be unknown; do not hand it to a diagram skill merely because it looks schematic. Use [diagram-handoff.md](diagram-handoff.md) only when reliable context establishes that the target is an author-drawn explanatory diagram rather than a computed result.
 
-Keep every derived value and styling decision traceable to the source image. Route work outside scientific chart/image reconstruction to the appropriate visual skill; semantic schematics belong terminally to `sci-diagram-pptx` under [diagram-handoff.md](diagram-handoff.md).
+## Four identifiability outcomes
 
-## Claim boundary
+Choose the strongest outcome the pixels support:
 
-Pixels alone cannot establish raw data, hidden exact values, preprocessing, model, implementation, parameter history, experimental conditions, sample identity, seed, calibration, uncertainty procedure, figure role, or paper claim. Do not label digitized points as original observations or present an appearance fit as direct recomputation, mechanism reproduction, or alternative validation.
+1. **Digitizable visible data.** Axis type, scale, units, series identity, and relevant marks are readable enough for calibration at the requested tolerance. Digitize the visible series or regions and report uncertainty from resolution, mark width, overlap, compression, or calibration. Call the values *image-derived estimates*, not original observations.
+2. **Partially identifiable content.** Some panels, labels, series, boundaries, or relative trends are readable while others are occluded or ambiguous. Reconstruct only the identifiable subset. Preserve missing content as unknown; do not complete hidden scientific values by interpolation or visual guesswork.
+3. **Appearance-only content.** The user explicitly wants a visual or editable reconstruction and the scientific data are not being claimed. Tracing, layout reconstruction, and styling are allowed, but label the result *appearance reconstruction*. An unqualified request to “reproduce” a scientific image is not permission to downgrade it to this category.
+4. **Essentially non-identifiable content.** The requested values, coordinate mapping, series identity, or generating method cannot be identified and are essential to the objective. Stop with a precise boundary and name the smallest material that could change it: for example the paper and target reference, a higher-resolution image, readable axis metadata, source data, plotting code, or method parameters.
 
-Reasonable assumptions may fill low-stakes styling or implementation details needed for a useful redraw, but not hidden scientific data, unreadable coordinate mapping, ambiguous series identity, or an unobserved generating method. Mark such choices as assumptions and do not tune them to imply evidence the pixels do not contain.
+Pixels alone do not establish raw data, hidden exact values, preprocessing, model implementation, experimental conditions, sample identity, seed, uncertainty procedure, or the paper's claim. Low-stakes layout choices may be assumed for a redraw, but hidden scientific content may not. Never trace a curve and describe it as simulation, tune guessed parameters to resemble the image, or present a visual fit as independent evidence.
 
-## Identifiability gate
+## Reconstruction and validation
 
-Before reconstruction, decide what the supplied pixels can support. Do not infer recoverability from chart type alone: a line or bar chart may still have unreadable scale type, legend mapping, marks, overlap, or resolution.
+Bind the source image and describe only visible panels, coordinate systems, marks, labels, and relationships. Select the smallest suitable technique: calibrated digitization, geometric measurement, tracing/vectorization, layout reconstruction, or plotting from digitized estimates. Without readable axes, restrict quantitative output to normalized or relative geometry.
 
-1. **Digitizable visible data.** Proceed with calibrated axes or coordinate mapping and digitization only when relevant scale type and units, series identity, and marks or boundaries are sufficiently readable to meet the requested tolerance. State the pixel-derived uncertainty. If the pixels cannot support that tolerance, narrow the result to a partially identifiable subset or block it. Digitized values must not be presented as original data or observations.
-2. **Partially identifiable content.** Reconstruct only the identifiable subset of panels, series, geometry, labels, or relative trends. Preserve missing, occluded, and scientifically ambiguous content as unknown rather than completing it; do not infer or guess hidden scientific content. Use ordinary presentation assumptions only when they do not invent data or alter the visible meaning.
-3. **Appearance-only content.** Use tracing, layout reconstruction, or styling only when the user explicitly seeks visual, geometric, or editable reconstruction. Label the output `appearance reconstruction`; do not use it as a scientific route.
-4. **Essentially non-identifiable content.** Choose `original-case-blocked` immediately when the requested data, coordinate mapping, or generation method cannot be identified from pixels and is necessary for the user's requested reproduction. State the smallest additional material that could change the route, such as the paper and figure reference, a higher-resolution original, readable axis metadata, source data, plotting code, method description, or parameter values. Do not search broadly or fit guessed data merely to avoid a blocker.
-5. **Semantic schematic.** Hand off terminally under [diagram-handoff.md](diagram-handoff.md) when meaning is carried mainly by labelled objects, connectors, formulas, grouping, containment, or topology.
+Validate only identifiable properties: coordinate mapping, panel and legend structure, visible ordering, intersections, peaks, boundaries, topology, requested editability, and rerunnability. Pixel identity is required only when the user makes a measurable appearance detail part of the objective. Stop when the requested identifiable properties are preserved; further pixel chasing does not strengthen scientific evidence.
 
-Image-derived reconstruction covers the first three outcomes only. The fourth is a precise blocker, not a failed attempt at image reconstruction.
+## Boundary and delivery
 
-An unqualified request to "reproduce this image" is not permission to downgrade a non-identifiable scientific target to appearance-only work. Offer appearance reconstruction as a distinct option only when it would satisfy the user's actual objective.
+For digitized or partial results, state prominently:
 
-Never present a pixel-derived reconstruction as a scientific conclusion or paper claim.
+> This result reconstructs only geometry or values observable in the supplied image, with stated uncertainty. It does not recover or validate the original data, method, experiment, or scientific conclusion.
 
-## Adaptive route
-
-For each target:
-
-1. Bind the verified target identity.
-2. Describe only visible marks, coordinate systems, panels, labels, and relationships.
-3. Identify resolution, line width, occlusion, compression, perspective, and antialiasing limits that matter to the requested artifact.
-4. Apply the identifiability gate and define the artifact and visible/geometric observable it must preserve.
-5. Select the smallest suitable method: calibrated digitization, measurement, tracing/vectorization, layout reconstruction, plotting-code regeneration, or appearance optimization.
-6. State material assumptions, non-identifiability, uncertainty, and acceptance criteria before iterative fitting.
-
-When axes permit calibration, quantify uncertainty from pixel resolution, mark width/size, and coordinate mapping. Without legible axes, restrict results to normalized or relative geometry.
-
-Prioritize the first useful V0. Before expanding investigation with another search branch, delegated task, broad probe, or additional fitting run, name internally the visible discrepancy or unknown and continue only when resolving it can change the required artifact, validation, safety, or material cost. Normal reads and commands inside the chosen step need no per-call justification. Do not reverse-search an unidentified image merely to avoid a blocker. Search for paper context only when a concrete visible identifier or user-supplied candidate makes the check bounded and identity resolution can change the route. Use no fixed iteration count.
-
-Validate only what the image can identify: coordinate mapping; panel, axes, legend, and annotation structure; geometry/topology; ordering, intersections, peaks, and visible trends; requested appearance; editability; and rerunnability. Require readable, semantically faithful presentation, not pixel identity, unless an explicit appearance objective makes a measurable visual detail material. Use labelled comparisons or overlays only when they resolve a material acceptance question and target-pixel rights permit them. Never report fitted values as independent scientific evidence.
-
-Stop when acceptance criteria pass or another change would only chase pixels without improving the required artifact. Preserve V0 and informative negative or failed attempts internally; do not expose redundant fitting versions in the customer folder.
-
-## Customer language and delivery
-
-For digitized or partial results, make the boundary prominent:
-
-> This result redraws only geometry or values observable from the supplied image, with stated uncertainty. It does not recover or validate the original data, method, experiment, or scientific conclusion.
-
-For appearance-only work, say that it is an appearance reconstruction. For an `original-case-blocked` outcome, state the missing identifiable element and the minimum material needed to change the route; do not supply a speculative reconstruction as if it were a result.
-
-Use [delivery-contract.md](delivery-contract.md) to assemble the customer folder. Include the selected reconstruction, rerun essentials when requested or useful, derived measurements needed to understand it, visible uncertainty, provenance, rights, and material limitations. Keep raw traces, QA overlays, internal manifests, search history, and intermediate fits in the transient workspace. Do not redistribute restricted target pixels.
+Deliver the selected reconstruction, its actual editable or rerunnable source when useful, the derived values needed to understand it, and a short note covering uncertainty, provenance, rights, and limitations. Keep calibration experiments, overlays, traces, searches, and intermediate fits out of the customer folder. Include the source image only when rerunning truly requires it and redistribution is permitted; otherwise identify it without copying restricted pixels. Follow [delivery-contract.md](delivery-contract.md) for the minimal package.
