@@ -28,15 +28,17 @@ Academic Repro first asks **how the target was produced and what evidence role i
 - Only author-drawn theory, process, or mechanism diagrams that are not themselves computational outputs are handed to a scientific-diagram tool.
 - One table may mix input, computed, and explanatory cells; classify it by column or cell group.
 
-Use direct recomputation when original code and inputs are available. When indispensable original material is not recoverable, build the smallest credible mechanism or use independent data, derivation, or implementation for alternative validation of the local claim. When evidence remains insufficient, state the boundary or blocker. Never fit curves to the published image, cherry-pick seeds after seeing the result, or invent unreported author parameters.
+Use direct recomputation when original code and inputs are available. Before implementing independently, make one bounded check only when author or paper-identified code could change the route or evidence boundary. When indispensable original material is not recoverable, build the smallest credible mechanism or use independent data, derivation, or implementation for alternative validation of the local claim. When evidence remains insufficient, state the boundary or blocker. Never fit curves to the published image, cherry-pick seeds after seeing the result, or invent unreported author parameters.
 
 ## What counts as passing
 
-A reproduction passes only when all three gates hold:
+A reproduction passes when all applicable scientific gates hold:
 
 1. **Credible generation** — it comes from a transparent, runnable data, equation, model, or algorithm chain rather than image fitting.
-2. **Claim preservation** — replacing the published target leaves the trend, ordering, difference, mechanism, or robustness proposition used by the caption and nearby text supported.
-3. **Visual-semantic preservation** — preserve chart form, panel relations, axes, units, legend mapping, grouping, and normalization when they carry the comparison; palette, typography, spacing, and pixel identity may change.
+2. **Method validity** — data handling, target quantity, comparison, experimental unit, uncertainty, and validity conditions satisfy what this study type actually requires.
+3. **Claim preservation** — frozen criteria are supported and the conclusion stays within the local scope warranted by the selected evidence basis.
+
+**Visual-semantic preservation** is an additional gate only when the user requests a replacement or faithful reconstruction. Preserve chart form, panel relations, axes, units, legend mapping, grouping, and normalization when they carry the comparison; palette, typography, spacing, and pixel identity may change.
 
 A threshold is a hard gate only when supported by the paper, an explicit user requirement, a method-validity condition, or defensible domain knowledge. An arbitrary similarity or “benefit retention” percentage may diagnose a result but cannot by itself turn a claim-preserving replacement into a scientific failure.
 
@@ -44,9 +46,11 @@ Targets from one experiment share fixed controls such as data split, base scenar
 
 ## Delivery
 
-The default customer folder contains only the final figure or table, the final source that produces it, indispensable non-regenerable inputs, minimal dependency instructions, and a short README with the conclusion, exact rerun command, key assumptions, and material limitations. Search history, debug logs, working drafts, validation ledgers, and irrelevant intermediate files remain internal. The proposed folder is rerun from a clean copy before delivery.
+The default customer folder contains only the final figure or table, the final source that produces it, indispensable non-regenerable inputs, minimal dependency instructions, and a short README with the conclusion, exact rerun command, key assumptions, and material limitations. Search history, debug logs, working drafts, validation ledgers, and irrelevant intermediate files remain internal. A clean-copy rerun is required before formal delivery or a claim that executable work is verified and rerunnable.
 
-Bundled helpers require Python 3.10+. Automatic PDF target extraction also needs `Pillow`, `pdfplumber`, and Poppler. See the [Skill specification](academic-repro/SKILL.md) for the full workflow.
+Evidence effort scales with risk: read-only assessment creates no record; an ordinary single-target reproduction keeps one compact summary; only a formal machine-verifiable package binds an evidence record and clean-rerun receipt. Study-specific checks for randomness, data splits, leakage, or repeated trials are enabled only when they could change the conclusion, avoiding a universal form that wastes time and tokens.
+
+The scientific decision workflow is operating-system independent. Bundled helpers require Python 3.10+ and currently target Linux/macOS; the complete workflow is not supported on Windows. Automatic PDF target location also needs `Pillow`, `pdfplumber`, and Poppler and currently recognizes English `Fig.`/`Figure` followed by a positive integer. Chinese labels, supplementary figures, tables, panels, and other complex labels can be supplied directly or bound with a reviewed manual label. See the [Skill specification](academic-repro/SKILL.md) for the full workflow.
 
 ## Local development and validation
 
@@ -56,8 +60,6 @@ cd academic-repro
 python -m pip install -r academic-repro/requirements.txt
 python -m unittest discover -s tests -v
 ```
-
-Transparent forward-evaluation cases for scientific judgment live in [`evals/scientific_judgment.json`](evals/scientific_judgment.json). During evaluation, give the model only the current Skill, the case `prompt`, and required raw artifacts; keep expected decisions hidden until scoring.
 
 ## License
 

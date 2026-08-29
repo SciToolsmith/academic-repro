@@ -140,6 +140,7 @@ class MaterializerTests(unittest.TestCase):
         result = run_materializer("--image", self.image_a, "--image", self.image_b, "--output", images_only)
         self.assert_ok(result)
         manifest = json.loads((images_only / "manifest.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["schemaVersion"], "academic-repro.targets/v1")
         self.assertEqual(manifest["targetCount"], 2)
         self.assertTrue(all(item["acquisitionMode"] == "images-only" for item in manifest["targets"]))
 
@@ -490,11 +491,12 @@ class MaterializerTests(unittest.TestCase):
             self.assertEqual(normalized.mode, "RGBA")
             self.assertEqual(normalized.getpixel((0, 0)), (10, 20, 30, 41))
 
-    def test_legacy_manifest_without_target_path_still_validates(self) -> None:
+    def test_legacy_schema_and_manifest_without_target_path_still_validate(self) -> None:
         workspace = self.root / "legacy"
         self.assert_ok(run_materializer("--image", self.image_a, "--output", workspace))
         manifest_path = workspace / "manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["schemaVersion"] = "scirepro.targets/v1"
         target = manifest["targets"][0]
         for key in ("targetPath", "targetMediaType", "normalizedMediaType", "normalizedRole"):
             target.pop(key)
@@ -504,8 +506,32 @@ class MaterializerTests(unittest.TestCase):
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-
         self.assert_ok(run_materializer("--verify-manifest", manifest_path, "--verify-all"))
+        verified = json.loads(manifest_path.read_text(encoding="utf-8"))
+        self.assertEqual(verified["schemaVersion"], "scirepro.targets/v1")
+
+        unsupported_path = workspace / "unsupported-manifest.json"
+        unsupported = json.loads(json.dumps(verified))
+        unsupported["schemaVersion"] = "academic-repro.targets/v0"
+        refresh_test_manifest_integrity(unsupported)
+        unsupported_path.write_text(
+            json.dumps(unsupported, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        rejected = run_materializer("--verify-manifest", unsupported_path, "--verify-all")
+        self.assertNotEqual(rejected.returncode, 0)
+        self.assertIn("unsupported target manifest schema", rejected.stderr)
+
+        unsupported["schemaVersion"] = []
+        refresh_test_manifest_integrity(unsupported)
+        unsupported_path.write_text(
+            json.dumps(unsupported, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        malformed = run_materializer("--verify-manifest", unsupported_path, "--verify-all")
+        self.assertNotEqual(malformed.returncode, 0)
+        self.assertIn("unsupported target manifest schema", malformed.stderr)
+        self.assertNotIn("Traceback", malformed.stderr)
 
 
 if __name__ == "__main__":

@@ -16,21 +16,21 @@ For each completed target, include only:
 
 Add a short `README.md` with the target and conclusion, one run command, required inputs and dependencies, material assumptions, and important limitations. Prefer a flat folder for one target. For several targets, use one clearly named subfolder per target and a shared folder only for inputs genuinely used by more than one target.
 
-Do not include drafts, duplicate versions, source searches, download caches, environment probes, raw logs, QA overlays, validation JSON, audit manifests, temporary tables, failed experiments, or intermediate files that the final source regenerates. Internal evidence can be valuable without becoming customer material. A blocked target with no reusable artifact is normally explained in chat or the shared README rather than given an empty folder.
+Do not include drafts, duplicate versions, source searches, download caches, environment probes, raw logs, QA overlays, temporary tables, failed experiments, or intermediate files that the final source regenerates. When formal machine binding is used, keep its compact evidence record and clean-rerun receipt internal by default; include them only when the user requests an audit bundle. A blocked target with no reusable artifact is normally explained in chat or the shared README rather than given an empty folder.
 
 The delivered source should produce the primary result by default. Diagnostics and optional exports should require an explicit option. Do not disguise an image as source, add a decoy driver, or include code that does not generate the delivered result.
 
 ## Clean rerun
 
-Before claiming rerunnability, copy only the proposed customer files into a clean temporary directory and execute the exact README command there. Confirm that:
+Before claiming rerunnability or verified executable work, copy only the proposed customer files into a clean temporary directory, remove declared outputs, and execute the exact README command there. Confirm that:
 
 - the documented dependencies are sufficient;
 - no undisclosed absolute paths, caches, credentials, or local-only files are read;
-- the primary result is regenerated at the documented location;
+- the primary result is regenerated from absence at the documented location;
 - the default command does not create unrelated noise; and
 - configuration, inputs, model files, and result names match the README.
 
-Keep this verification workspace and its logs outside the delivery. If a clean rerun cannot be performed, say what was verified and what remains dependent on an unavailable runtime, license, service, or input. Do not replace missing evidence with a claim that the folder is self-contained.
+For a formal v5 package, bind the command, environment digest, recreated output paths, output hashes, and criterion-equivalent checks in the internal evidence record. For a small manual delivery, a concise verification note is sufficient unless the user requests machine-verifiable evidence. Keep the verification workspace and raw logs outside the delivery. If a clean rerun cannot be performed, say what was verified and what remains dependent on an unavailable runtime, license, service, or input. Do not replace missing evidence with a claim that the folder is self-contained or machine-verified.
 
 ## Inputs, rights, and large files
 
@@ -55,12 +55,12 @@ python <skill-root>/scripts/assemble_delivery.py \
   --output-root /path/to/customer-deliveries
 ```
 
-For backward compatibility, the assembler retains the legacy `scirepro.delivery-plan/v4` interface identifier; it is a wire-format name, not the current Skill name. The assembler creates a new destination rather than updating an existing folder. The plan is an internal tool input, not a customer artifact. Its fields fall into a few groups:
+Use the `academic-repro.delivery-plan/v5` interface when a machine-bound formal package is worth the extra check. Every validated scientific target in a v5 plan references one compact internal `academic-repro.evidence/v1` record and its SHA-256. The assembler also accepts `academic-repro.delivery-plan/v4` and `scirepro.delivery-plan/v4` as legacy inputs for lighter or existing workflows, but those plans do not gain the v5 machine-bound evidence guarantee. These are internal wire-format names rather than customer-facing artifacts. The assembler creates a new destination rather than updating an existing folder. Its fields fall into a few groups:
 
 - package identity and distribution: schema version, title, slug, conclusion, shared files, and licenses;
-- target identity and scientific boundary: ID, title, kind, route, statuses, assumptions, conclusion, and limitations;
+- target identity and scientific boundary: ID, title, kind, route, statuses, assumptions, conclusion, limitations, and evidence-record reference;
 - production artifacts: primary result, source, configuration, inputs, models, environment declaration, and requested extras;
-- rerun information: entrypoint, argument vector, expected outputs, and dependency note; and
+- rerun information: entrypoint, argument vector, expected outputs, dependency note, and clean-rerun receipt bound through the evidence record; and
 - per-file provenance and rights.
 
 Use the script's validation and tests as the exact interface reference when invoking it; do not expose its schema vocabulary in the customer README or require the assembler for ordinary reproduction. A plan may record richer internal reasoning so the tool can reject inconsistent packaging, but those records do not belong in the final folder.

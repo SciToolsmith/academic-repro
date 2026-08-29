@@ -17,7 +17,7 @@ Such targets may look like schematics, but their structure is data. Reproduce th
 
 Hand off only author-drawn theory, mechanism, process, workflow, route, circuit, or conceptual diagrams whose scientific content is an explanation rather than the output of the computation under study. The appropriate objective is then faithful, editable reconstruction, not experimental recomputation.
 
-When `sci-diagram-pptx` is available, transfer that target there. Do not create an Academic Repro execution result merely to redraw it.
+When `sci-diagram-pptx` is already available, transfer that target there. If it is unavailable, explain the handoff and suggest an explicit user-managed installation; Academic Repro must not install or update another skill automatically. Do not create an Academic Repro execution result merely to redraw it.
 
 For a mixed figure, classify panels separately when their boundaries and captions make them independent. A computed panel stays in Academic Repro; an explanatory panel may be handed off. Preserve the parent figure and panel identity in both routes.
 

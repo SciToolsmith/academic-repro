@@ -1965,7 +1965,7 @@ def main() -> int:
         "explicitMatlabLiveProbeCount": 1 if matlab_live_probed else 0,
     }
     report = {
-        "schemaVersion": "scirepro.environment/v2",
+        "schemaVersion": "academic-repro.environment/v2",
         "captureStatus": "recorded" if engines else "partial",
         "engines": engines,
         "packages": packages,

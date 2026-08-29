@@ -38,7 +38,8 @@ except ImportError:  # pragma: no cover - depends on the selected local runtime
     Image = ImageDraw = ImageOps = None
 
 
-SCHEMA_VERSION = "scirepro.targets/v1"
+SCHEMA_VERSION = "academic-repro.targets/v1"
+SUPPORTED_SCHEMA_VERSIONS = {SCHEMA_VERSION, "scirepro.targets/v1"}
 ACQUISITION_MODES = {
     "paper-with-images",
     "paper-with-figure-references",
@@ -455,6 +456,11 @@ def canonical_manifest(manifest: dict) -> bytes:
 
 
 def refresh_manifest_integrity(manifest: dict) -> None:
+    schema_version = manifest.get("schemaVersion")
+    require(
+        isinstance(schema_version, str) and schema_version in SUPPORTED_SCHEMA_VERSIONS,
+        f"unsupported target manifest schema: {schema_version}",
+    )
     integrity = manifest.setdefault("integrity", {})
     integrity["algorithm"] = "sha256"
     integrity["canonicalization"] = "json-sort-keys-v1"
@@ -928,7 +934,11 @@ def target_record(
 
 def validate_manifest(manifest: object, *, root: Optional[Path] = None, require_verified: bool = False) -> Dict[str, dict]:
     require(isinstance(manifest, dict), "target manifest must be an object")
-    require(manifest.get("schemaVersion") == SCHEMA_VERSION, f"unsupported target manifest schema: {manifest.get('schemaVersion')}")
+    schema_version = manifest.get("schemaVersion")
+    require(
+        isinstance(schema_version, str) and schema_version in SUPPORTED_SCHEMA_VERSIONS,
+        f"unsupported target manifest schema: {schema_version}",
+    )
     integrity = manifest.get("integrity")
     require(isinstance(integrity, dict), "target manifest integrity is required")
     require(integrity.get("algorithm") == "sha256", "target manifest integrity algorithm must be sha256")
