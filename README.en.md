@@ -3,7 +3,7 @@
 <p align="center"><strong>From published figures, tables, and computed structures back to a credible, runnable, testable research process</strong></p>
 <p align="center"><a href="README.md">简体中文</a> · English · <a href="academic-repro/SKILL.md">Skill specification</a></p>
 
-Academic Repro is a Codex Skill for reproducing the simulation, training, measurement, statistical, or algorithmic process behind an academic figure, table, or computed structure. It asks whether the generated result can replace the published target while supporting the same local paper claim. The goal is not pixel imitation, and a successful command is not proof of an entire paper.
+Academic Repro is a Codex Skill for reproducing the simulation, training, measurement, statistical, or algorithmic process behind an academic figure, table, or computed structure. It asks whether the result still supports the same local paper claim. The default objective is local-claim equivalence, not the assumption that every omitted detail can be recovered; exact numerical or visual identity is pursued only when requested and supported by the available materials.
 
 ## Install and invoke
 
@@ -28,13 +28,15 @@ Academic Repro first asks **how the target was produced and what evidence role i
 - Only author-drawn theory, process, or mechanism diagrams that are not themselves computational outputs are handed to a scientific-diagram tool.
 - One table may mix input, computed, and explanatory cells; classify it by column or cell group.
 
-Use direct recomputation when original code and inputs are available. Before implementing independently, make one bounded check only when author or paper-identified code could change the route or evidence boundary. When indispensable original material is not recoverable, build the smallest credible mechanism or use independent data, derivation, or implementation for alternative validation of the local claim. When evidence remains insufficient, state the boundary or blocker. Never fit curves to the published image, cherry-pick seeds after seeing the result, or invent unreported author parameters.
+For an author-workflow reproduction, first bind the target to its entry point, input, consequential parameters, and output. When target-relevant author source and a compatible local environment are usable, preserve the original language and native runtime by default: if `.m` source actually runs, deliver `.m` rather than rewriting it for convenience. Make a cross-language implementation primary only for an explicit portability or independence objective, a stronger scientific cross-check, or a genuine native blocker, and disclose the changed evidence boundary. Method provenance and input identity remain separate: author source on reconstructed input is not exact target recomputation.
+
+The published image may inform presentation-only choices such as palette, typography, spacing, and line style. Encoding choices such as axis scale, normalization, binning, and smoothing can alter interpretation, so their basis must be disclosed and underlying values checked separately. Claim-defining input selection, preprocessing, parameters, splits, seeds, thresholds, or runs must not be chosen to reach the paper's number or appearance. A visible feature used for calibration cannot also serve as independent validation.
 
 ## What counts as passing
 
 A reproduction passes when all applicable scientific gates hold:
 
-1. **Credible generation** — it comes from a transparent, runnable data, equation, model, or algorithm chain rather than image fitting.
+1. **Credible generation** — it comes from a transparent, runnable data, equation, model, or algorithm chain rather than outcome-directed parameter fitting.
 2. **Method validity** — data handling, target quantity, comparison, experimental unit, uncertainty, and validity conditions satisfy what this study type actually requires.
 3. **Claim preservation** — frozen criteria are supported and the conclusion stays within the local scope warranted by the selected evidence basis.
 
@@ -42,13 +44,15 @@ A reproduction passes when all applicable scientific gates hold:
 
 A threshold is a hard gate only when supported by the paper, an explicit user requirement, a method-validity condition, or defensible domain knowledge. An arbitrary similarity or “benefit retention” percentage may diagnose a result but cannot by itself turn a claim-preserving replacement into a scientific failure.
 
+A paper's reported number is a validation reference, not an optimization objective. If a paper reports a metric above 98% and a comparable reproduction is lower, the Skill first checks the target, input or split, preprocessing, metric definition, code version, and stochastic protocol, then runs only the smallest check that can distinguish a named cause or change evidence status. It evaluates absolute level, relative improvement or ordering, qualitative trend, and mechanism separately. It does not chase the threshold indefinitely or infer fabrication from mismatch alone. Even when exact released code, data, split, and metric repeatedly miss a material claim, the bounded conclusion is that the released materials did not reproduce the claim under tested conditions—not an unsupported misconduct allegation.
+
 Targets from one experiment share fixed controls such as data split, base scenario, checkpoint, and metric definition while retaining intended changes such as penetration, topology, noise, or method. A shared upstream failure propagates to dependent targets; a target-specific failure does not hide the others.
 
 ## Delivery
 
-The default customer folder contains only the final figure or table, the final source that produces it, indispensable non-regenerable inputs, minimal dependency instructions, and a short README with the conclusion, exact rerun command, key assumptions, and material limitations. Search history, debug logs, working drafts, validation ledgers, and irrelevant intermediate files remain internal. A clean-copy rerun is required before formal delivery or a claim that executable work is verified and rerunnable.
+The default customer folder contains only the final figure or table, the actual source in the language used to generate it, indispensable non-regenerable inputs, minimal dependencies and required notices, and a short README. Its opening reproduction statement gives the evidence level, paper target or reported value, observed result, supported and unsupported claim components, substitutions, and material limits, followed by one exact command. Regenerable CSV/JSON, searches, debug logs, drafts, validation ledgers, evidence records, and receipts remain internal unless requested as an audit bundle or independently useful.
 
-Evidence effort scales with risk: read-only assessment creates no record; an ordinary single-target reproduction keeps one compact summary; only a formal machine-verifiable package binds an evidence record and clean-rerun receipt. Study-specific checks for randomness, data splits, leakage, or repeated trials are enabled only when they could change the conclusion, avoiding a universal form that wastes time and tokens.
+Evidence effort scales with risk: read-only assessment creates no record; an ordinary single-target reproduction keeps one compact summary; only a formal machine-verifiable package or an explicit `verified`/`rerunnable` claim binds evidence and requires a clean rerun. Checks for randomness, splits, leakage, or repeated trials are enabled only when they could change the conclusion, avoiding a universal form that wastes time and tokens.
 
 The scientific decision workflow is operating-system independent. Bundled helpers require Python 3.10+ and currently target Linux/macOS; the complete workflow is not supported on Windows. Automatic PDF target location also needs `Pillow`, `pdfplumber`, and Poppler and currently recognizes English `Fig.`/`Figure` followed by a positive integer. Chinese labels, supplementary figures, tables, panels, and other complex labels can be supplied directly or bound with a reviewed manual label. See the [Skill specification](academic-repro/SKILL.md) for the full workflow.
 

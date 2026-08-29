@@ -1,24 +1,24 @@
 # Customer delivery
 
-The customer folder is the finished reproduction and the minimum production material needed to understand and rerun it. It is not a record of the investigation. Build it from a fresh whitelist after scientific validation is complete.
+The customer folder is the finished reproduction, not the investigation record. At first glance it should answer: what is the result, what produced it, how is it rerun, and what does it establish? Build it from a fresh whitelist after validation.
 
 ## Default package
 
 For each completed target, include only:
 
 1. the primary result requested by the user, whether a figure, table, or editable artifact;
-2. the actual final source that generates that result;
+2. the actual final source that generated it, in the language and runtime used;
 3. configuration the source reads;
 4. indispensable non-regenerable inputs or model files;
 5. the smallest dependency declaration needed to run it;
 6. licenses or notices required by included third-party material; and
 7. an extra output only when requested or independently useful downstream.
 
-Add a short `README.md` with the target and conclusion, one run command, required inputs and dependencies, material assumptions, and important limitations. Prefer a flat folder for one target. For several targets, use one clearly named subfolder per target and a shared folder only for inputs genuinely used by more than one target.
+Add a short `README.md`. Open with one compact reproduction statement: evidence level, paper target or reported value, observed result, supported and unsupported parts of the local claim, route or material substitutions, and important limits. Then give one exact run command and required inputs and dependencies. State absence of target-directed scientific tuning when that fact is material. Prefer a flat folder for one target; use subfolders only for several targets and share only genuinely reused inputs.
 
-Do not include drafts, duplicate versions, source searches, download caches, environment probes, raw logs, QA overlays, temporary tables, failed experiments, or intermediate files that the final source regenerates. When formal machine binding is used, keep its compact evidence record and clean-rerun receipt internal by default; include them only when the user requests an audit bundle. A blocked target with no reusable artifact is normally explained in chat or the shared README rather than given an empty folder.
+Do not include drafts, duplicates, searches, caches, probes, raw logs, QA overlays, temporary tables, failed experiments, or regenerable intermediate CSV/JSON outputs. Keep formal evidence records and clean-rerun receipts internal unless the user requests an audit bundle. A blocked target with no reusable artifact is normally explained in chat or the shared README rather than given an empty folder.
 
-The delivered source should produce the primary result by default. Diagnostics and optional exports should require an explicit option. Do not disguise an image as source, add a decoy driver, or include code that does not generate the delivered result.
+The delivered source should produce the primary result by default. Diagnostics and optional exports require an explicit option. Do not replace the executed native source with an unrelated port, disguise an image as source, add a decoy driver, or include code that does not generate the result.
 
 ## Clean rerun
 

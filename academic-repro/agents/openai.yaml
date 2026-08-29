@@ -1,4 +1,4 @@
 interface:
   display_name: "Academic Repro"
   short_description: "复现或评估论文中的计算图表与定量结果，并明确科学证据边界"
-  default_prompt: "Use $academic-repro to assess or reproduce this paper target, state the evidence basis and limits first, and create or package artifacts only when requested."
+  default_prompt: "Use $academic-repro to assess or reproduce this paper target. Prefer usable target-relevant author source in its native runtime, treat reported values as tests rather than tuning goals, state the evidence boundary, and keep any requested delivery concise."

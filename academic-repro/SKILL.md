@@ -5,7 +5,7 @@ description: Reproduce or assess computation- and data-derived results from rese
 
 # Academic Repro
 
-Reproduce the evidence behind a target, not its pixels. Build the smallest transparent process that can test the target's narrow local paper claim. Exact appearance matters only when it carries scientific meaning or the user requests a replacement compatible with the original presentation.
+Reproduce a defensible target-producing process and test its narrow local claim—not hidden details, identical pixels, or a reported number at any cost. Default to local-claim equivalence; pursue exact identity only when requested and the source, input, and runtime support it. Treat a mismatch as evidence, not a tuning objective.
 
 ## 1. Select the user intent
 
@@ -36,7 +36,7 @@ Before tuning or final execution, establish a compact target contract containing
 5. requested fidelity: exact output, metric equivalence, local-claim equivalence, or visible reconstruction;
 6. evidence basis, material assumptions, consequential unknowns, and evidence boundary.
 
-Keep this contract in reasoning or a short working note when that is sufficient; do not create a form merely to restate the paper. Separate visible observations from author interpretation. Freeze justified criteria before inspecting final outputs; do not lower them after seeing results. A user preference may define project acceptance but does not become scientific authority by itself.
+Keep this contract in reasoning or a short working note when sufficient; do not create a form merely to restate the paper. Separate visible observations from author interpretation. Freeze scientific criteria and claim-defining choices before final outputs; do not lower them afterward. Presentation preferences may be refined only while computed values and scientific encoding stay unchanged. User preference may define project acceptance but is not scientific authority by itself.
 
 Reconstruct only the target-dependent chain: inputs, preprocessing, method, parameters and randomness, aggregation, and visual encoding. Do not expand into a full-paper reproduction unless an additional stage can change the target's conclusion. Resolve or test an unknown only when plausible choices could change the route, validity, acceptance, or claim.
 
@@ -53,9 +53,9 @@ Use the strongest minimal basis that answers the user's question:
 - **Image-derived reconstruction:** only visible values, geometry, topology, or appearance; never the hidden experiment.
 - **Blocked:** no honest basis can answer the objective because a material input, mapping, method, authority, or capability is unavailable.
 
-Before independent implementation, make one bounded check for author or paper-identified code only when finding it could change the evidence basis or boundary. Prefer a pinned author-native route when it is material and usable; otherwise stop searching and declare the selected basis. Read [source-environment-audit.md](references/source-environment-audit.md) only while a source or native-environment uncertainty remains consequential.
+Before translating, map the target to its author entry point, input, consequential parameters, output, and native runtime. For author-workflow reproduction, preserve usable target-relevant author source and runtime by default. Use a cross-language primary route only for an explicit independent or portable objective, a stronger cross-check, or a genuine native blocker, and disclose the boundary. Method provenance and input identity are separate: native author code on reconstructed input is not exact target recomputation. Read [source-environment-audit.md](references/source-environment-audit.md) only while a source or environment uncertainty remains consequential.
 
-Never fit hidden parameters to the published image, call traced pixels simulated data, select favorable random seeds after seeing results, or tune until the picture looks right. A mechanism that reproduces a calibrated trend is only mechanism-consistent unless it also passes an independent held-out prediction, negative control, or mechanism-discriminating check.
+Separate image-informed choices. Presentation-only palette, typography, spacing, and line style may be inferred when computed values stay unchanged. Interpretation-changing encoding such as scale, normalization, binning, or smoothing must be justified, disclosed, and checked against underlying values. Never select claim-defining inputs, preprocessing, parameters, splits, seeds, thresholds, or runs to reach the reported number or appearance. A calibrated feature cannot validate itself; a calibrated mechanism match remains mechanism-consistent without an independent prediction, negative control, or discriminating check.
 
 For related targets, share only controls that the paper's design truly shares. Preserve intended contrasts, validate each target separately, and propagate a shared upstream failure only to dependent targets. Validate panels jointly when the caption's claim depends on their comparison.
 
@@ -63,10 +63,10 @@ For related targets, share only controls that the paper's design truly shares. P
 
 Keep five dimensions distinct: user intent, target origin, evidence basis, validation scope, and final status. Also report operational status, validation status, and scientific-claim status separately.
 
-Apply the scientific gates in [execution-validation.md](references/execution-validation.md): traceable generation, method validity, and claim evaluation. Apply visual-semantic fidelity as an additional gate only when the requested output must replace or faithfully reconstruct the published presentation. A crash or missing dependency does not refute the paper; claim-equivalent evidence does not prove the author's hidden workflow.
+Apply the scientific gates in [execution-validation.md](references/execution-validation.md): traceable generation, method validity, and claim evaluation. Add visual-semantic fidelity only for a replacement or faithful reconstruction. When a number misses the paper, verify comparability, then run only a check that can distinguish a named cause or change status. Evaluate absolute value, relative improvement, trend, and mechanism separately; stop before threshold chasing. Mismatch alone does not establish misconduct, only what was not reproduced under tested conditions.
 
 Scale evidence work to consequence. Read-only assessment creates no record. An ordinary single-target reproduction keeps only a compact summary of identity, basis, criterion, command, result, and status. A formal executable package adds a machine-bound record and clean-rerun receipt. Add seeds, repetitions, splits, controls, robustness checks, or a full audit bundle only when the study design, release risk, or user request makes them consequential. Follow [evidence-contract.md](references/evidence-contract.md) for this risk ladder.
 
-Before a formal customer delivery or a claim of `rerunnable` or `verified`, execute the exact documented command from a clean copy and bind the receipt, source, inputs, result, criteria, and target identity by digest. Follow [delivery-contract.md](references/delivery-contract.md) whenever delivering executable work.
+Before a formal machine-verifiable delivery or a claim of `rerunnable` or `verified`, run the exact documented command from a clean copy and bind its receipt to the target and artifacts. Do not promote ordinary work merely because files exist. Follow [delivery-contract.md](references/delivery-contract.md) for executable delivery.
 
-Default customer delivery stays concise: the primary result, actual generating source, indispensable non-regenerable inputs or configuration, minimum dependencies, and a short README with the conclusion, evidence basis, command, assumptions, and material limits. Keep detailed evidence records internal unless the user requests an audit bundle. For read-only assessment, answer directly and create no artifacts.
+Default delivery stays concise: primary result; actual generating source in the language and runtime used; indispensable inputs or configuration; minimum dependencies and notices; and a short README. Its opening reproduction statement gives the evidence level, paper target, observed result, supported claim parts, substitutions, limits, and one run command. Keep regenerable diagnostics, evidence records, and receipts internal unless requested or independently useful. Read-only assessment creates no artifacts.

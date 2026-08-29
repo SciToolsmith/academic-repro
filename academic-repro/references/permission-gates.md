@@ -12,7 +12,7 @@ Proceed with:
 - create-only code, results, and temporary files in a dedicated local workspace;
 - use of an existing compatible open-source environment;
 - creation of a project-local open-source environment that does not change global packages;
-- a bounded, reviewed local command or runtime probe with no login, payment, privilege, remote submission, external messaging, or uncertain system effect;
+- a bounded, reviewed run or probe in an existing compatible environment, including already-installed and activated proprietary software, when it needs no new agreement, login, payment, activation, shared license, privilege, remote service, or uncertain system effect;
 - assembly of a new customer folder after useful results exist.
 
 Use reasonable resources proportional to the task and honor any stricter user limit. Do not create approval forms, execution contracts, or gate artifacts; ask genuine decisions concisely in chat.
