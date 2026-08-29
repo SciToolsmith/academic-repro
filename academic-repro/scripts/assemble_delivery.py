@@ -15,6 +15,7 @@ import hashlib
 import html
 import json
 import os
+import posixpath
 import re
 import shlex
 import shutil
@@ -848,6 +849,11 @@ def _validate_rerun_paths(target: dict) -> None:
         target["entrypoint"] in source_paths,
         f"{target['id']} entrypoint must resolve to a delivered sourceFiles artifact",
     )
+    if target["destinationParent"].parts:
+        require(
+            target["entrypoint"].startswith(f"{target['id']}/"),
+            f"{target['id']} multi-target entrypoint must be target-specific",
+        )
     inline_eval = {"-c", "-e", "--eval"}.intersection(argv)
     require(
         not inline_eval,
@@ -942,14 +948,21 @@ def _markdown(value: str) -> str:
     return escaped.replace("[", "\\[").replace("]", "\\]").replace("|", "\\|")
 
 
-def _link_text(link: ArtifactLink) -> str:
-    return f"[{_markdown(link.label)}]({link.destination.as_posix()})"
+def _relative_destination(destination: Path, base: Path = Path()) -> str:
+    if not base.parts:
+        return destination.as_posix()
+    return posixpath.relpath(destination.as_posix(), start=base.as_posix())
 
 
-def _result_text(link: ArtifactLink) -> List[str]:
-    lines = [f"**Main result:** {_link_text(link)}"]
+def _link_text(link: ArtifactLink, base: Path = Path()) -> str:
+    return f"[{_markdown(link.label)}]({_relative_destination(link.destination, base)})"
+
+
+def _result_text(link: ArtifactLink, base: Path = Path()) -> List[str]:
+    destination = _relative_destination(link.destination, base)
+    lines = [f"**Main result:** {_link_text(link, base)}"]
     if link.destination.suffix.casefold() in PREVIEW_SUFFIXES:
-        lines.extend(["", f"![{_markdown(link.label)}]({link.destination.as_posix()})"])
+        lines.extend(["", f"![{_markdown(link.label)}]({destination})"])
     return lines
 
 
@@ -1009,149 +1022,186 @@ def _deduplicated_lines(*groups: Sequence[str]) -> List[str]:
     return result
 
 
+def _append_blocked_status(lines: List[str], target: dict) -> None:
+    lines.extend([
+        "",
+        "## Reproduction status",
+        "",
+        f"**Target:** {_markdown(target['title'])}",
+        "",
+        "**Status:** Exact reproduction was not run.",
+        "",
+        f"**Reason:** {_markdown(target['blocker'])}",
+        "",
+        _markdown(target["conclusion"]),
+    ])
+    boundary = _deduplicated_lines(
+        target["materialAssumptions"], target["limitations"]
+    )
+    if boundary:
+        lines.extend(["", "## Boundary and next requirement", ""])
+        lines.extend(f"- {_markdown(item)}" for item in boundary)
+
+
+def _append_target_details(lines: List[str], target: dict, link_base: Path) -> None:
+    if target["evidenceBasis"] is not None:
+        lines.extend([
+            "",
+            f"**Evidence basis:** {_markdown(_evidence_basis_label(target['evidenceBasis']))}",
+            "",
+            f"**Scientific status:** {_markdown(_claim_status_label(target['claimStatus']))}",
+        ])
+        if target["evidenceRecord"]["cleanRerun"]["status"] == "passed":
+            lines.extend(["", "**Clean rerun:** Verified from a fresh copy."])
+    material_substitutions = [
+        decision
+        for decision in target["stageDecisions"]
+        if decision["materialToClaim"]
+        and decision["authorNative"] is not None
+        and decision["selected"] != decision["authorNative"]
+    ]
+    if material_substitutions:
+        lines.extend(["", "### Implementation boundaries", ""])
+        for decision in material_substitutions:
+            summary = (
+                f"{_stage_label(decision['stage']).capitalize()}: "
+                f"{_engine_label(decision['selected'])} replaced author-native "
+                f"{_engine_label(decision['authorNative'])}. "
+                f"{decision['evidenceBoundary']} Reason: {decision['reason']}"
+            )
+            lines.append(f"- {_markdown(summary)}")
+    if target["blocker"]:
+        lines.extend(["", f"**Blocker:** {_markdown(target['blocker'])}"])
+    if target["mainLink"] is None:
+        lines.extend(["", "**Main result:** No result"])
+    else:
+        lines.append("")
+        lines.extend(_result_text(target["mainLink"], link_base))
+    if target["route"] == "mechanism-reproduction":
+        lines.extend(["", "**Scope:** mechanism-level reproduction."])
+    elif target["route"] == "alternative-validation":
+        lines.extend(["", "**Scope:** independent or alternative validation."])
+    if target["kind"] == "image-derived":
+        if target["mainLink"] is None:
+            lines.extend(["", (
+                "**Scope:** No image-derived reconstruction was produced; "
+                "the supplied pixels did not identify the information required for the requested result."
+            )])
+        else:
+            lines.extend(["", (
+                "**Scope:** image-derived reconstruction of visible geometry, values, or appearance; "
+                "it does not recover or validate the original data, method, experiment, or scientific conclusion."
+            )])
+    elif target["kind"] == "semantic-diagram":
+        lines.extend(["", (
+            "**Scope:** editable reconstruction of the supplied schematic; "
+            "it does not test a scientific claim."
+        )])
+    if target["rerunArgv"]:
+        lines.extend([
+            "",
+            "### Re-run",
+            "",
+            "Run from the delivery root:",
+            "",
+            "```sh",
+            shlex.join(target["rerunArgv"]),
+            "```",
+        ])
+        lines.append(f"Dependencies: {_markdown(target['dependencyNote'])}")
+    role_labels = {
+        "sourceFiles": "Code",
+        "configFiles": "Configuration",
+        "inputFiles": "Required input",
+        "modelFiles": "Required models",
+        "environmentFiles": "Environment",
+        "requestedExtras": "Requested additional files",
+    }
+    material_roles = [role for role in DELIVERY_ROLE_FIELDS if target["roleLinks"][role]]
+    if material_roles:
+        lines.extend(["", "### Files", ""])
+        for role in material_roles:
+            links = ", ".join(
+                _link_text(link, link_base) for link in target["roleLinks"][role]
+            )
+            lines.append(f"- **{role_labels[role]}:** {links}")
+    assumptions_and_limits = _deduplicated_lines(
+        target["materialAssumptions"], target["limitations"]
+    )
+    if assumptions_and_limits:
+        lines.extend(["", "### Assumptions and limits", ""])
+        lines.extend(f"- {_markdown(item)}" for item in assumptions_and_limits)
+    has_third_party = any(
+        link.rights != "generated"
+        for role in DELIVERY_ROLE_FIELDS
+        for link in target["roleLinks"][role]
+    ) or (target["mainLink"] is not None and target["mainLink"].rights != "generated")
+    if has_third_party:
+        lines.extend(["", "### Third-party materials", "", _markdown(target["rights"])])
+
+
+def _build_target_readme(target: dict) -> str:
+    lines = [
+        f"# {_markdown(target['title'])}",
+        "",
+        "[Back to reproduction overview](../README.md)",
+    ]
+    if target["route"] == "original-case-blocked":
+        _append_blocked_status(lines, target)
+    else:
+        lines.extend(["", "## Result", "", _markdown(target["conclusion"])])
+        _append_target_details(lines, target, Path(target["id"]))
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _build_readme(plan: dict, targets: List[dict], licenses: List[CopyArtifact]) -> str:
     lines = [f"# {_markdown(plan['title'])}"]
 
-    if len(targets) == 1 and targets[0]["route"] == "original-case-blocked":
+    if len(targets) == 1:
         target = targets[0]
-        lines.extend([
-            "",
-            "## Reproduction status",
-            "",
-            f"**Target:** {_markdown(target['title'])}",
-            "",
-            "**Status:** Exact reproduction was not run.",
-            "",
-            f"**Reason:** {_markdown(target['blocker'])}",
-            "",
-            _markdown(target["conclusion"]),
-        ])
-        boundary = _deduplicated_lines(
-            target["materialAssumptions"], target["limitations"]
+        if target["route"] == "original-case-blocked":
+            _append_blocked_status(lines, target)
+        else:
+            lines.extend(["", "## Result", "", _markdown(target["conclusion"])])
+            _append_target_details(lines, target, Path())
+    else:
+        has_common = any(
+            link.destination.parts and link.destination.parts[0] == "common"
+            for target in targets
+            for role in DELIVERY_ROLE_FIELDS
+            for link in target["roleLinks"][role]
         )
-        if boundary:
-            lines.extend(["", "## Boundary and next requirement", ""])
-            lines.extend(f"- {_markdown(item)}" for item in boundary)
-        lines.append("")
-        return "\n".join(lines)
-
-    if len(targets) > 1:
         lines.extend([
             "",
             f"> {_markdown(plan['conclusion'])}",
             "",
-            "## Results",
+            "## Reproduction units",
             "",
-            "| Target | Main result |",
+            (
+                "Each unit folder contains its result and concise status; executable units also contain "
+                "their actual generating source and rerun command."
+            ),
+        ])
+        if has_common:
+            lines.extend([
+                "",
+                "Files used by more than one unit are stored once under `common/`.",
+            ])
+        lines.extend([
+            "",
+            "| Unit | Main result |",
             "|---|---|",
         ])
         for target in targets:
-            lines.append(
-                "| " + " | ".join((
-                    f"`{target['id']}` — {_markdown(target['title'])}",
-                    "No result" if target["mainLink"] is None else _link_text(target["mainLink"]),
-                )) + " |"
+            unit_readme = f"{target['id']}/README.md"
+            unit_label = _markdown(f"{target['id']} — {target['title']}")
+            result = (
+                f"[No result — see status]({unit_readme})"
+                if target["mainLink"] is None
+                else _link_text(target["mainLink"])
             )
-
-    for target in targets:
-        lines.extend([
-            "",
-            "## Result" if len(targets) == 1 else f"## `{target['id']}` — {_markdown(target['title'])}",
-            "",
-            _markdown(target["conclusion"]),
-        ])
-        if target["evidenceBasis"] is not None:
-            lines.extend([
-                "",
-                f"**Evidence basis:** {_markdown(_evidence_basis_label(target['evidenceBasis']))}",
-                "",
-                f"**Scientific status:** {_markdown(_claim_status_label(target['claimStatus']))}",
-            ])
-            if target["evidenceRecord"]["cleanRerun"]["status"] == "passed":
-                lines.extend(["", "**Clean rerun:** Verified from a fresh copy."])
-        material_substitutions = [
-            decision
-            for decision in target["stageDecisions"]
-            if decision["materialToClaim"]
-            and decision["authorNative"] is not None
-            and decision["selected"] != decision["authorNative"]
-        ]
-        if material_substitutions:
-            lines.extend(["", "### Implementation boundaries", ""])
-            for decision in material_substitutions:
-                summary = (
-                    f"{_stage_label(decision['stage']).capitalize()}: "
-                    f"{_engine_label(decision['selected'])} replaced author-native "
-                    f"{_engine_label(decision['authorNative'])}. "
-                    f"{decision['evidenceBoundary']} Reason: {decision['reason']}"
-                )
-                lines.append(f"- {_markdown(summary)}")
-        if target["blocker"]:
-            lines.extend(["", f"**Blocker:** {_markdown(target['blocker'])}"])
-        if target["mainLink"] is None:
-            lines.extend(["", "**Main result:** No result"])
-        else:
-            lines.append("")
-            lines.extend(_result_text(target["mainLink"]))
-        if target["route"] == "mechanism-reproduction":
-            lines.extend(["", "**Scope:** mechanism-level reproduction."])
-        elif target["route"] == "alternative-validation":
-            lines.extend(["", "**Scope:** independent or alternative validation."])
-        if target["kind"] == "image-derived":
-            if target["mainLink"] is None:
-                lines.extend(["", (
-                    "**Scope:** No image-derived reconstruction was produced; "
-                    "the supplied pixels did not identify the information required for the requested result."
-                )])
-            else:
-                lines.extend(["", (
-                    "**Scope:** image-derived reconstruction of visible geometry, values, or appearance; "
-                    "it does not recover or validate the original data, method, experiment, or scientific conclusion."
-                )])
-        elif target["kind"] == "semantic-diagram":
-            lines.extend(["", (
-                "**Scope:** editable reconstruction of the supplied schematic; "
-                "it does not test a scientific claim."
-            )])
-        if target["rerunArgv"]:
-            lines.extend([
-                "",
-                "### Re-run",
-                "",
-                "Run from the delivery root:",
-                "",
-                "```sh",
-                shlex.join(target["rerunArgv"]),
-                "```",
-            ])
-            lines.append(f"Dependencies: {_markdown(target['dependencyNote'])}")
-        role_labels = {
-            "sourceFiles": "Code",
-            "configFiles": "Configuration",
-            "inputFiles": "Required input",
-            "modelFiles": "Required models",
-            "environmentFiles": "Environment",
-            "requestedExtras": "Requested additional files",
-        }
-        material_roles = [role for role in DELIVERY_ROLE_FIELDS if target["roleLinks"][role]]
-        if material_roles:
-            lines.extend(["", "### Files", ""])
-            for role in material_roles:
-                links = ", ".join(_link_text(link) for link in target["roleLinks"][role])
-                lines.append(f"- **{role_labels[role]}:** {links}")
-        assumptions_and_limits = _deduplicated_lines(
-            target["materialAssumptions"], target["limitations"]
-        )
-        if assumptions_and_limits:
-            lines.extend(["", "### Assumptions and limits", ""])
-            lines.extend(f"- {_markdown(item)}" for item in assumptions_and_limits)
-        has_third_party = any(
-            link.rights != "generated"
-            for role in DELIVERY_ROLE_FIELDS
-            for link in target["roleLinks"][role]
-        ) or (target["mainLink"] is not None and target["mainLink"].rights != "generated")
-        if has_third_party:
-            lines.extend(["", "### Third-party materials", "", _markdown(target["rights"])])
+            lines.append(f"| [{unit_label}]({unit_readme}) | {result} |")
 
     if licenses:
         lines.extend(["", "## Licenses", ""])
@@ -1971,6 +2021,15 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
 
     readme = _build_readme(plan, targets, licenses)
     require(_secret_match(readme) is None, "generated README contains secret-shaped text")
+    target_readmes = (
+        {target["id"]: _build_target_readme(target) for target in targets}
+        if len(targets) > 1
+        else {}
+    )
+    require(
+        all(_secret_match(value) is None for value in target_readmes.values()),
+        "generated target README contains secret-shaped text",
+    )
 
     output_root = _checked_output_root(output_root)
     destination = output_root / f"{slug}-reproduction"
@@ -1979,6 +2038,12 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
     try:
         (staging / "README.md").write_text(readme, encoding="utf-8")
         os.chmod(staging / "README.md", 0o644)
+        for target_id, target_readme in target_readmes.items():
+            target_directory = staging / target_id
+            target_directory.mkdir(parents=True, exist_ok=True)
+            target_readme_path = target_directory / "README.md"
+            target_readme_path.write_text(target_readme, encoding="utf-8")
+            os.chmod(target_readme_path, 0o644)
         for artifact in sorted(copies, key=lambda item: item.destination.as_posix().casefold()):
             output = staging / artifact.destination
             output.parent.mkdir(parents=True, exist_ok=True)

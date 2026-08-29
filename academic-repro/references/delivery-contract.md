@@ -18,6 +18,12 @@ Add a short `README.md`. Open with one compact reproduction statement: evidence 
 
 Exclude drafts, duplicates, searches, caches, probes, logs, QA overlays, failed experiments, and regenerable intermediate CSV/JSON outputs. Keep formal evidence records and clean-rerun receipts internal unless an audit bundle is requested. The delivered source should produce the primary result by default; diagnostics need an option. Do not replace the executed native source with an unrelated port, disguise an image as source, add a decoy driver, or include code that does not generate the result.
 
+## Multi-target learning structure
+
+Use one folder per independently understandable reproduction unit, not automatically per exported image or panel. A completed unit contains its primary result and a concise `README.md` covering conclusion, files, and limits; an executable unit also contains a meaningful unit-specific entrypoint and exact command. Keep the root `README.md` as a short index. Put a function, dataset, model, environment declaration, or author dependency under `common/` only when at least two units actually use it; do not duplicate it into every folder. An optional root launcher may run all units, but it must not hide the implementation in one monolithic program or replace the unit entrypoints.
+
+Keep inseparable panels or outputs from one coupled computation in one unit. A single target remains flat. A blocked unit in an otherwise useful multi-target delivery gets a folder containing only its one-screen status `README.md`; completed siblings remain independently usable.
+
 ## Blocked exact route
 
 Do not manufacture a package when an indispensable, non-regenerable input blocks the exact route before execution. Assessment-only work ends in chat. When reproduction files or a customer folder were requested, deliver a one-screen `README.md` and nothing else. State the target, that exact reproduction was not run, the missing material, the bounded authoritative sources checked, and the smallest item that would unblock it. Include no source, dependency or configuration file, command, synthetic substitute, diagnostic, evidence record, or rerun receipt.

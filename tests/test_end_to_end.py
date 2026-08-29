@@ -102,10 +102,11 @@ def run_assembler(plan: Path, output_root: Path) -> Path:
 
 
 def assert_customer_links(test: unittest.TestCase, delivery: Path) -> None:
-    readme = (delivery / "README.md").read_text(encoding="utf-8")
-    for raw_link in MARKDOWN_LINK.findall(readme):
-        test.assertFalse(raw_link.startswith(("/", "~")), raw_link)
-        test.assertTrue((delivery / raw_link).is_file(), raw_link)
+    for readme_path in delivery.rglob("README.md"):
+        readme = readme_path.read_text(encoding="utf-8")
+        for raw_link in MARKDOWN_LINK.findall(readme):
+            test.assertFalse(raw_link.startswith(("/", "~")), raw_link)
+            test.assertTrue((readme_path.parent / raw_link).is_file(), raw_link)
 
 
 def assert_no_internal_artifacts(test: unittest.TestCase, delivery: Path) -> None:
@@ -487,19 +488,25 @@ class ScientificWorkflowE2ETests(unittest.TestCase):
             )
             self.assertEqual(
                 {path.name for path in (delivery / "fig-02").iterdir()},
-                {"editable.pptx", "preview.png"},
+                {"README.md", "editable.pptx", "preview.png"},
             )
             self.assertFalse(any(path.name == "build.mjs" for path in delivery.rglob("*")))
             readme = (delivery / "README.md").read_text(encoding="utf-8")
-            self.assertIn("image-derived reconstruction", readme)
-            self.assertIn("editable reconstruction of the supplied schematic", readme)
-            self.assertNotIn("`image-derived`", readme)
-            self.assertNotIn("`semantic-diagram`", readme)
-            self.assertNotIn("`image-derived-reconstruction`", readme)
-            self.assertNotIn("`semantic-diagram-handoff`", readme)
-            self.assertNotIn("The visible decreasing geometry was checked.", readme)
-            self.assertIn("The fixture uses arbitrary axis scaling.", readme)
-            self.assertNotIn("`not-applicable`", readme)
+            curve_readme = (delivery / "fig-01/README.md").read_text(encoding="utf-8")
+            diagram_readme = (delivery / "fig-02/README.md").read_text(encoding="utf-8")
+            combined_readmes = "\n".join((readme, curve_readme, diagram_readme))
+            self.assertIn("## Reproduction units", readme)
+            self.assertIn("[fig-01 — Response curve](fig-01/README.md)", readme)
+            self.assertNotIn("image-derived reconstruction", readme)
+            self.assertIn("image-derived reconstruction", curve_readme)
+            self.assertIn("editable reconstruction of the supplied schematic", diagram_readme)
+            self.assertNotIn("`image-derived`", combined_readmes)
+            self.assertNotIn("`semantic-diagram`", combined_readmes)
+            self.assertNotIn("`image-derived-reconstruction`", combined_readmes)
+            self.assertNotIn("`semantic-diagram-handoff`", combined_readmes)
+            self.assertNotIn("The visible decreasing geometry was checked.", combined_readmes)
+            self.assertIn("The fixture uses arbitrary axis scaling.", curve_readme)
+            self.assertNotIn("`not-applicable`", combined_readmes)
             assert_customer_links(self, delivery)
             assert_no_internal_artifacts(self, delivery)
 

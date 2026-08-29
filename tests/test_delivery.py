@@ -1209,10 +1209,37 @@ class DeliveryAssemblerTests(unittest.TestCase):
             readme = (delivery / "README.md").read_text(encoding="utf-8")
             self.assertEqual(len(list((delivery / "common").iterdir())), 1)
             self.assertFalse((delivery / "LICENSES").exists())
-            self.assertIn("No result", readme)
+            self.assertIn("## Reproduction units", readme)
+            self.assertIn("[fig-01 — Target fig-01](fig-01/README.md)", readme)
+            self.assertIn("[fig-03 — Blocked fig-03](fig-03/README.md)", readme)
+            self.assertIn("[No result — see status](fig-03/README.md)", readme)
+            self.assertIn("stored once under `common/`", readme)
+            self.assertNotIn("### Re-run", readme)
             self.assertNotIn("`blocked`", readme)
-            self.assertIn("The required original input was not published.", readme)
-            self.assertFalse((delivery / "fig-03").exists())
+            self.assertNotIn("The required original input was not published.", readme)
+
+            quantitative_readme = (delivery / "fig-01/README.md").read_text(encoding="utf-8")
+            self.assertIn("[result.png](result.png)", quantitative_readme)
+            self.assertIn("![result.png](result.png)", quantitative_readme)
+            self.assertIn("[reproduce.py](reproduce.py)", quantitative_readme)
+            self.assertIn("[common-environment.txt](../common/common-environment.txt)", quantitative_readme)
+            self.assertIn(
+                "python3 fig-01/reproduce.py --config fig-01/parameters.json",
+                quantitative_readme,
+            )
+
+            diagram_readme = (delivery / "fig-02/README.md").read_text(encoding="utf-8")
+            self.assertIn("[result.pptx](result.pptx)", diagram_readme)
+            self.assertIn("node fig-02/build.mjs --config fig-02/parameters.json", diagram_readme)
+
+            blocked_directory = delivery / "fig-03"
+            self.assertEqual(
+                {path.name for path in blocked_directory.iterdir()},
+                {"README.md"},
+            )
+            blocked_readme = (blocked_directory / "README.md").read_text(encoding="utf-8")
+            self.assertIn("The required original input was not published.", blocked_readme)
+            self.assertNotIn("### Re-run", blocked_readme)
             self.assertFalse(any(path.is_dir() and not any(path.iterdir()) for path in delivery.rglob("*")))
 
     def test_common_requires_cross_target_reuse_and_reserved_target_ids_are_rejected(self) -> None:
@@ -1251,6 +1278,38 @@ class DeliveryAssemblerTests(unittest.TestCase):
                 )
                 self.assertEqual(rejected.returncode, 2)
                 self.assertIn("reserved delivery-root name", rejected.stderr)
+
+    def test_multi_target_entrypoint_cannot_be_only_a_shared_driver(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            shared = [fixture.artifact(
+                "shared/driver.py",
+                "driver.py",
+                "print('shared driver')\n",
+            )]
+            targets = [
+                fixture.target("fig-01", reference=False),
+                fixture.target("fig-02", reference=False),
+            ]
+            for target in targets:
+                target["sourceFiles"] = [{"commonRef": "driver.py"}]
+            plan = fixture.plan(targets, common=shared)
+            value = json.loads(plan.read_text(encoding="utf-8"))
+            for index, target in enumerate(value["targets"]):
+                target["entrypoint"] = "common/driver.py"
+                target["rerunArgv"] = [
+                    "python3",
+                    "common/driver.py",
+                    "--config",
+                    f"{target['id']}/parameters.json",
+                ]
+                fixture.sync_evidence_argv(value, index)
+            plan.write_text(json.dumps(value), encoding="utf-8")
+
+            rejected = run_assembler(plan, root / "out", check=False)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertIn("multi-target entrypoint must be target-specific", rejected.stderr)
 
     def test_scientific_status_matrix_rejects_inconsistent_states(self) -> None:
         invalid = [
