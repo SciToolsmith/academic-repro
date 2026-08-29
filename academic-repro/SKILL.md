@@ -5,11 +5,11 @@ description: Reproduce or assess computation- and data-derived results from rese
 
 # Academic Repro
 
-Reproduce a defensible target-producing process and test its narrow local claim—not hidden details, identical pixels, or a reported number at any cost. Default to local-claim equivalence; pursue exact identity only when requested and the source, input, and runtime support it. Treat a mismatch as evidence, not a tuning objective.
+Reproduce a defensible target-producing process and test its local claim—not hidden details or a reported number at any cost. Default to claim equivalence; pursue exact identity only when requested and supported. Treat mismatch as evidence, not a tuning objective.
 
 ## 1. Select the user intent
 
-Keep the requested mode separate from the scientific evidence route:
+Separate user mode from evidence route:
 
 - **Assess:** explain feasibility, evidence boundaries, likely routes, and blockers. Stay read-only unless the user asks for artifacts or execution.
 - **Reproduce:** recover or implement a target-producing chain, run it, and evaluate the declared observables.
@@ -23,7 +23,7 @@ Keep the requested mode separate from the scientific evidence route:
 - **Explanatory artifact:** an author-drawn theory, mechanism, process, or system diagram. This is outside Academic Repro; read [diagram-handoff.md](references/diagram-handoff.md) only when reconstruction is requested.
 - **Image-only evidence:** pixels without sufficient paper, data, or method context. Recover only identifiable information; read [image-derived-reconstruction.md](references/image-derived-reconstruction.md).
 
-Visual form never decides the route. A mixed table or figure may contain separate input, computed, explanatory, and image-derived targets. Resolve uncertain identity from the caption, nearby text, numbering, panels, axes, units, and legends before execution. Read [target-figure-acquisition.md](references/target-figure-acquisition.md) when extraction, identity binding, or multi-target tracking is needed.
+Visual form never decides the route. Split mixed figures or tables into input, computed, explanatory, and image-derived targets. Resolve identity from the caption, nearby text, numbering, axes, units, and legends. Read [target-figure-acquisition.md](references/target-figure-acquisition.md) when extraction or multi-target binding is needed.
 
 ## 3. Freeze the scientific target
 
@@ -36,9 +36,11 @@ Before tuning or final execution, establish a compact target contract containing
 5. requested fidelity: exact output, metric equivalence, local-claim equivalence, or visible reconstruction;
 6. evidence basis, material assumptions, consequential unknowns, and evidence boundary.
 
-Keep this contract in reasoning or a short working note when sufficient; do not create a form merely to restate the paper. Separate visible observations from author interpretation. Freeze scientific criteria and claim-defining choices before final outputs; do not lower them afterward. Presentation preferences may be refined only while computed values and scientific encoding stay unchanged. User preference may define project acceptance but is not scientific authority by itself.
+Keep the contract in reasoning or a short note; do not create a form merely to restate the paper. Separate observation from interpretation. Freeze scientific criteria and claim-defining choices before final outputs. Presentation may change only while values and scientific encoding stay fixed. User preference can define project acceptance, not scientific authority.
 
-Reconstruct only the target-dependent chain: inputs, preprocessing, method, parameters and randomness, aggregation, and visual encoding. Do not expand into a full-paper reproduction unless an additional stage can change the target's conclusion. Resolve or test an unknown only when plausible choices could change the route, validity, acceptance, or claim.
+Reconstruct only the target-dependent chain. Do not expand into a full-paper reproduction unless another stage can change the conclusion. Resolve an unknown only when plausible choices could change the route, validity, acceptance, or claim.
+
+Before implementation, gate an exact-output or author-workflow target on indispensable, non-regenerable author-specific input. Check user files, the paper and supplement or availability statement, official author source, and any directly cited data source. If no compatible input exists after this bounded pass, mark the exact route blocked and stop before substitute hunting or artifact creation. Do not digitize, synthesize, port, scaffold, smoke-test, or clean-rerun unless the user chooses a different objective. Paper-defined simulations, public benchmark inputs, and incidental presentation details bypass this gate.
 
 ## 4. Choose and disclose the evidence basis
 
@@ -55,13 +57,13 @@ Use the strongest minimal basis that answers the user's question:
 
 Before translating, map the target to its author entry point, input, consequential parameters, output, and native runtime. For author-workflow reproduction, preserve usable target-relevant author source and runtime by default. Use a cross-language primary route only for an explicit independent or portable objective, a stronger cross-check, or a genuine native blocker, and disclose the boundary. Method provenance and input identity are separate: native author code on reconstructed input is not exact target recomputation. Read [source-environment-audit.md](references/source-environment-audit.md) only while a source or environment uncertainty remains consequential.
 
-Separate image-informed choices. Presentation-only palette, typography, spacing, and line style may be inferred when computed values stay unchanged. Interpretation-changing encoding such as scale, normalization, binning, or smoothing must be justified, disclosed, and checked against underlying values. Never select claim-defining inputs, preprocessing, parameters, splits, seeds, thresholds, or runs to reach the reported number or appearance. A calibrated feature cannot validate itself; a calibrated mechanism match remains mechanism-consistent without an independent prediction, negative control, or discriminating check.
+Separate image-informed choices. Palette, typography, spacing, and line style may be inferred when values stay unchanged. Scale, normalization, binning, or smoothing require justification and checks against underlying values. Never select claim-defining inputs, preprocessing, parameters, splits, seeds, thresholds, or runs to reach the reported number or appearance. A calibrated feature cannot validate itself; without an independent check, the match remains mechanism-consistent.
 
 For related targets, share only controls that the paper's design truly shares. Preserve intended contrasts, validate each target separately, and propagate a shared upstream failure only to dependent targets. Validate panels jointly when the caption's claim depends on their comparison.
 
 ## 5. Validate and report without upgrading the evidence
 
-Keep five dimensions distinct: user intent, target origin, evidence basis, validation scope, and final status. Also report operational status, validation status, and scientific-claim status separately.
+Keep user intent, target origin, evidence basis, validation scope, and final status distinct. Report operational, validation, and scientific-claim status separately.
 
 Apply the scientific gates in [execution-validation.md](references/execution-validation.md): traceable generation, method validity, and claim evaluation. Add visual-semantic fidelity only for a replacement or faithful reconstruction. When a number misses the paper, verify comparability, then run only a check that can distinguish a named cause or change status. Evaluate absolute value, relative improvement, trend, and mechanism separately; stop before threshold chasing. Mismatch alone does not establish misconduct, only what was not reproduced under tested conditions.
 
@@ -69,4 +71,6 @@ Scale evidence work to consequence. Read-only assessment creates no record. An o
 
 Before a formal machine-verifiable delivery or a claim of `rerunnable` or `verified`, run the exact documented command from a clean copy and bind its receipt to the target and artifacts. Do not promote ordinary work merely because files exist. Follow [delivery-contract.md](references/delivery-contract.md) for executable delivery.
 
-Default delivery stays concise: primary result; actual generating source in the language and runtime used; indispensable inputs or configuration; minimum dependencies and notices; and a short README. Its opening reproduction statement gives the evidence level, paper target, observed result, supported claim parts, substitutions, limits, and one run command. Keep regenerable diagnostics, evidence records, and receipts internal unless requested or independently useful. Read-only assessment creates no artifacts.
+For a completed target, default delivery stays concise: primary result, actual generating source in the language and runtime used, indispensable inputs or configuration, minimum dependencies and notices, and a short README with one run command. Keep regenerable diagnostics, evidence records, and receipts internal unless requested or independently useful.
+
+For an exact route blocked before execution, assessment-only work ends in chat. When reproduction files or a customer folder are expected, create only a one-screen README naming the target, status, indispensable missing material, bounded sources checked, and smallest item that would unblock it. Do not add source, dependencies, commands, synthetic substitutes, or rerun receipts. Alternative-data reconstruction or a future scaffold is a separate objective and requires an explicit request.

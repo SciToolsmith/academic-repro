@@ -1114,6 +1114,40 @@ class DeliveryAssemblerTests(unittest.TestCase):
             self.assertIn("should be returned in chat", rejected.stderr)
             self.assertFalse((root / "out/example-study-reproduction").exists())
 
+    def test_original_case_blocked_target_delivers_one_screen_readme_only(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            target = fixture.blocked_target("fig-27")
+            target["limitations"] = [
+                "Checked the paper, supplement, availability statement, and official author package.",
+                "A compatible original Experiment B trace would unblock exact reproduction.",
+            ]
+            delivery = Path(
+                json.loads(run_assembler(fixture.plan([target]), root / "out").stdout)["path"]
+            )
+            self.assertEqual({path.name for path in delivery.iterdir()}, {"README.md"})
+            readme = (delivery / "README.md").read_text(encoding="utf-8")
+            self.assertIn("**Status:** Exact reproduction was not run.", readme)
+            self.assertIn("The required original input was not published.", readme)
+            self.assertIn("A compatible original Experiment B trace would unblock", readme)
+            self.assertNotIn("**Main result:**", readme)
+            self.assertNotIn("### Re-run", readme)
+            self.assertLessEqual(len(readme.splitlines()), 18)
+
+    def test_original_case_blocked_target_rejects_scaffold_artifacts(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            target = fixture.blocked_target("fig-27")
+            target["sourceFiles"] = [
+                fixture.artifact("work/future.py", "future.py", "print('future')\n")
+            ]
+            rejected = run_assembler(fixture.plan([target]), root / "out", check=False)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertIn("may not include production artifacts", rejected.stderr)
+            self.assertFalse((root / "out/example-study-reproduction").exists())
+
     def test_unsupported_scientific_result_has_a_minimal_negative_delivery(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)

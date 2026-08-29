@@ -54,6 +54,23 @@ class BehaviorContractTests(unittest.TestCase):
         self.assertIn("already-installed and activated proprietary software", permissions)
         self.assertIn("needs no new agreement, login, payment, activation, shared license", permissions)
 
+    def test_non_regenerable_input_fast_block_stops_fallback_build(self) -> None:
+        entrypoint = self.read("SKILL.md")
+        source_audit = self.read("references/source-environment-audit.md")
+        delivery = self.read("references/delivery-contract.md")
+
+        self.assertIn("gate an exact-output or author-workflow target", entrypoint)
+        self.assertIn("stop before substitute hunting or artifact creation", entrypoint)
+        for exception in (
+            "paper-defined simulations",
+            "public benchmark inputs",
+            "presentation details",
+        ):
+            self.assertIn(exception, entrypoint + source_audit)
+        self.assertIn("stop before broad search", source_audit)
+        self.assertIn("a one-screen `README.md` and nothing else", delivery)
+        self.assertIn("future-ready scaffold is a separate objective", delivery)
+
 
 if __name__ == "__main__":
     unittest.main()

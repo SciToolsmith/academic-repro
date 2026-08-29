@@ -1,53 +1,44 @@
 # Customer delivery
 
-The customer folder is the finished reproduction, not the investigation record. At first glance it should answer: what is the result, what produced it, how is it rerun, and what does it establish? Build it from a fresh whitelist after validation.
+The customer folder is the finished reproduction, not the investigation record. It should immediately show the result, what produced it, how to rerun it, and what it establishes. Build it from a fresh whitelist after validation.
 
-## Default package
+## Completed target
 
-For each completed target, include only:
+Include only:
 
-1. the primary result requested by the user, whether a figure, table, or editable artifact;
-2. the actual final source that generated it, in the language and runtime used;
-3. configuration the source reads;
-4. indispensable non-regenerable inputs or model files;
-5. the smallest dependency declaration needed to run it;
-6. licenses or notices required by included third-party material; and
-7. an extra output only when requested or independently useful downstream.
+1. the requested primary result;
+2. the actual generating source, in the language and runtime used;
+3. configuration read by that source;
+4. indispensable non-regenerable inputs or models;
+5. the smallest dependency declaration;
+6. required third-party notices; and
+7. requested or independently useful extras.
 
-Add a short `README.md`. Open with one compact reproduction statement: evidence level, paper target or reported value, observed result, supported and unsupported parts of the local claim, route or material substitutions, and important limits. Then give one exact run command and required inputs and dependencies. State absence of target-directed scientific tuning when that fact is material. Prefer a flat folder for one target; use subfolders only for several targets and share only genuinely reused inputs.
+Add a short `README.md`. Open with one compact reproduction statement: evidence level, paper target or reported value, observed result, supported and unsupported parts of the local claim, material substitutions, and limits. Then give one exact command, required inputs, and dependencies. Prefer a flat folder for one target and share only genuinely reused inputs.
 
-Do not include drafts, duplicates, searches, caches, probes, raw logs, QA overlays, temporary tables, failed experiments, or regenerable intermediate CSV/JSON outputs. Keep formal evidence records and clean-rerun receipts internal unless the user requests an audit bundle. A blocked target with no reusable artifact is normally explained in chat or the shared README rather than given an empty folder.
+Exclude drafts, duplicates, searches, caches, probes, logs, QA overlays, failed experiments, and regenerable intermediate CSV/JSON outputs. Keep formal evidence records and clean-rerun receipts internal unless an audit bundle is requested. The delivered source should produce the primary result by default; diagnostics need an option. Do not replace the executed native source with an unrelated port, disguise an image as source, add a decoy driver, or include code that does not generate the result.
 
-The delivered source should produce the primary result by default. Diagnostics and optional exports require an explicit option. Do not replace the executed native source with an unrelated port, disguise an image as source, add a decoy driver, or include code that does not generate the result.
+## Blocked exact route
+
+Do not manufacture a package when an indispensable, non-regenerable input blocks the exact route before execution. Assessment-only work ends in chat. When reproduction files or a customer folder were requested, deliver a one-screen `README.md` and nothing else. State the target, that exact reproduction was not run, the missing material, the bounded authoritative sources checked, and the smallest item that would unblock it. Include no source, dependency or configuration file, command, synthetic substitute, diagnostic, evidence record, or rerun receipt.
+
+A substitute-data reproduction, image-derived approximation, or future-ready scaffold is a separate objective. Produce one only when explicitly requested; then follow the normal route and delivery rules for what actually ran.
 
 ## Clean rerun
 
-Before claiming rerunnability or verified executable work, copy only the proposed customer files into a clean temporary directory, remove declared outputs, and execute the exact README command there. Confirm that:
+Before claiming `rerunnable`, `verified`, or formal machine verification, copy only proposed customer files into a clean temporary directory, remove declared outputs, and execute the exact README command. Confirm that dependencies suffice; no undisclosed paths, caches, credentials, or local-only files are read; the primary result is regenerated at the documented path; and the command creates no unrelated noise.
 
-- the documented dependencies are sufficient;
-- no undisclosed absolute paths, caches, credentials, or local-only files are read;
-- the primary result is regenerated from absence at the documented location;
-- the default command does not create unrelated noise; and
-- configuration, inputs, model files, and result names match the README.
+For a formal v5 package, bind the command, environment digest, recreated outputs, hashes, and criterion checks in the internal evidence record. A small manual delivery needs only a concise verification note. If clean rerun is impossible, state what was checked and what still depends on an unavailable runtime, license, service, or input. Never call such a package self-contained or machine-verified.
 
-For a formal v5 package, bind the command, environment digest, recreated output paths, output hashes, and criterion-equivalent checks in the internal evidence record. For a small manual delivery, a concise verification note is sufficient unless the user requests machine-verifiable evidence. Keep the verification workspace and raw logs outside the delivery. If a clean rerun cannot be performed, say what was verified and what remains dependent on an unavailable runtime, license, service, or input. Do not replace missing evidence with a claim that the folder is self-contained or machine-verified.
+## Inputs and rights
 
-## Inputs, rights, and large files
+Include an input or model only when the final route reads it, it cannot be regenerated, and redistribution is permitted. A comparison crop is not a production input unless pixels are read during rerun.
 
-Include an input or model only when the final route actually reads it, it cannot be regenerated by the delivered source, and redistribution is permitted. A paper crop used only for visual comparison is not a production input. For image-derived reconstruction, the supplied image is an input only when rerunning genuinely needs its pixels.
-
-When a required dataset, checkpoint, or other file is large, private, licensed, or otherwise restricted, omit it and state:
-
-- its exact identity, version, and expected location;
-- an authorized acquisition method or source;
-- an integrity check when available; and
-- the effect of its absence on rerunning the work.
-
-Call the package self-contained only when every required component may be included and was verified. Do not redistribute paper figures, private paths, credentials, or third-party material without suitable rights. Include license text only when required by material actually delivered.
+For a large, private, licensed, or restricted required file, omit it and state its identity and expected location, authorized acquisition source, available integrity check, and effect on rerunning. Call a package self-contained only when every required component may be included and was verified. Do not redistribute papers, private paths, credentials, or third-party material without suitable rights.
 
 ## Optional delivery assembler
 
-Manual assembly is the default for a small, clear delivery. Use `<skill-root>/scripts/assemble_delivery.py` only when its additional structure is useful—for example a multi-target package, repeated shared inputs, explicit distribution rights, or automated whitelist validation.
+Manual assembly is default for a small delivery. Use `<skill-root>/scripts/assemble_delivery.py` when multi-target structure, shared inputs, rights checks, or automated whitelist validation justify it:
 
 ```bash
 python <skill-root>/scripts/assemble_delivery.py \
@@ -55,14 +46,6 @@ python <skill-root>/scripts/assemble_delivery.py \
   --output-root /path/to/customer-deliveries
 ```
 
-Use the `academic-repro.delivery-plan/v5` interface when a machine-bound formal package is worth the extra check. Every validated scientific target in a v5 plan references one compact internal `academic-repro.evidence/v1` record and its SHA-256. The assembler also accepts `academic-repro.delivery-plan/v4` and `scirepro.delivery-plan/v4` as legacy inputs for lighter or existing workflows, but those plans do not gain the v5 machine-bound evidence guarantee. These are internal wire-format names rather than customer-facing artifacts. The assembler creates a new destination rather than updating an existing folder. Its fields fall into a few groups:
+Use `academic-repro.delivery-plan/v5` only when machine-bound evidence is worthwhile. It binds each validated scientific target to an `academic-repro.evidence/v1` record and clean-rerun receipt. Legacy v4 plans remain accepted without that guarantee. These are internal interfaces: use script validation and tests as their reference, and never expose schema vocabulary in the customer README or require the assembler for ordinary work.
 
-- package identity and distribution: schema version, title, slug, conclusion, shared files, and licenses;
-- target identity and scientific boundary: ID, title, kind, route, statuses, assumptions, conclusion, limitations, and evidence-record reference;
-- production artifacts: primary result, source, configuration, inputs, models, environment declaration, and requested extras;
-- rerun information: entrypoint, argument vector, expected outputs, dependency note, and clean-rerun receipt bound through the evidence record; and
-- per-file provenance and rights.
-
-Use the script's validation and tests as the exact interface reference when invoking it; do not expose its schema vocabulary in the customer README or require the assembler for ordinary reproduction. A plan may record richer internal reasoning so the tool can reject inconsistent packaging, but those records do not belong in the final folder.
-
-Whether assembled manually or by the helper, the same principle governs delivery: one clean result, the real means to reproduce it, and no process clutter.
+Whether assembled manually or by the helper, deliver one clean result and its real means of generation, or one concise blocked note—never process clutter.
