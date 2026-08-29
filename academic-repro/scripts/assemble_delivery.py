@@ -1012,6 +1012,29 @@ def _deduplicated_lines(*groups: Sequence[str]) -> List[str]:
 def _build_readme(plan: dict, targets: List[dict], licenses: List[CopyArtifact]) -> str:
     lines = [f"# {_markdown(plan['title'])}"]
 
+    if len(targets) == 1 and targets[0]["route"] == "original-case-blocked":
+        target = targets[0]
+        lines.extend([
+            "",
+            "## Reproduction status",
+            "",
+            f"**Target:** {_markdown(target['title'])}",
+            "",
+            "**Status:** Exact reproduction was not run.",
+            "",
+            f"**Reason:** {_markdown(target['blocker'])}",
+            "",
+            _markdown(target["conclusion"]),
+        ])
+        boundary = _deduplicated_lines(
+            target["materialAssumptions"], target["limitations"]
+        )
+        if boundary:
+            lines.extend(["", "## Boundary and next requirement", ""])
+            lines.extend(f"- {_markdown(item)}" for item in boundary)
+        lines.append("")
+        return "\n".join(lines)
+
     if len(targets) > 1:
         lines.extend([
             "",
@@ -1784,6 +1807,19 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
             bool(target["rerunArgv"]) == bool(target["entrypoint"]) == bool(target["rerunOutputs"]),
             f"{target_id} must provide rerunArgv, entrypoint, and rerunOutputs together",
         )
+        if target["route"] == "original-case-blocked":
+            require(
+                target["mainLink"] is None,
+                f"{target_id} blocked exact route may not include a result",
+            )
+            require(
+                not any(target["roleLinks"][role] for role in DELIVERY_ROLE_FIELDS),
+                f"{target_id} blocked exact route may not include production artifacts",
+            )
+            require(
+                not target["rerunArgv"],
+                f"{target_id} blocked exact route may not include a rerun command",
+            )
         if target["rerunArgv"]:
             require(
                 bool(target["dependencyNote"]),
@@ -1850,10 +1886,16 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
         has_durable_artifact = only_target["mainLink"] is not None or any(
             only_target["roleLinks"][role] for role in DELIVERY_ROLE_FIELDS
         )
+        readme_only_blocked = only_target["route"] == "original-case-blocked"
         require(
-            has_durable_artifact,
+            has_durable_artifact or readme_only_blocked,
             "single-target work with no durable result or production material should be returned in chat",
         )
+        if readme_only_blocked:
+            require(
+                not licenses,
+                "README-only blocked delivery may not include license files",
+            )
 
     referenced_common = {shared_ref.casefold() for _, _, shared_ref, _ in pending_refs}
     common_target_refs: Dict[str, set[str]] = {}
