@@ -5,7 +5,7 @@ Evidence should reduce ambiguity, not become a second research project. Use the 
 ## Choose the evidence tier
 
 - **Assessment:** stay read-only. Report feasibility, likely evidence basis, unknowns, and blockers. Create no evidence file.
-- **Ordinary reproduction or validation:** keep one compact internal summary covering target identity, evidence basis, criterion, command, result, and status. A paragraph or small object is enough; do not create a ledger for each routine step.
+- **Ordinary reproduction or validation:** keep one compact summary of target identity, evidence basis, paper target, observed result, criterion, command, and status. A paragraph or small object is enough; do not create a ledger for routine steps.
 - **Formal executable package:** use one `academic-repro.evidence/v1` record per validated scientific target, bind it to the delivery, and obtain a clean-rerun receipt.
 - **Study-specific or audit work:** add only the checks made consequential by stochastic behavior, empirical design, safety, external release, or an explicit audit request. A full audit bundle is an output choice, not the default workflow.
 
@@ -33,7 +33,7 @@ A calibrated mechanism match is `mechanism-consistent`. Upgrade it to `supported
 
 ## Use clean reruns only for reproducibility claims
 
-A clean rerun is required before formal delivery or before calling executable work `rerunnable` or `verified`; it is not required for read-only assessment or every exploratory run. Copy only proposed customer files into a fresh workspace, remove declared outputs, run the exact documented argument vector, and confirm that outputs are recreated.
+A clean rerun is required for a formal machine-verifiable package or before calling work `rerunnable` or `verified`; ordinary reproduction, read-only assessment, and exploration do not automatically enter this tier. Copy proposed customer files into a fresh workspace, remove outputs, run the documented argument vector, and confirm recreation.
 
 Use `exact-sha256` when outputs should be byte-identical. Use `criteria-equivalent` for stochastic or platform-sensitive outputs and re-evaluate every frozen criterion on the clean-run outputs. Merely finding a pre-existing result is not a clean rerun.
 

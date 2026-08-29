@@ -4,7 +4,7 @@ Use this reference only when an unresolved fact about code, data, equations, or 
 
 ## Start from the target-producing chain
 
-Read the caption, target-relevant paper sections, supplement and availability statements, and supplied or already-local files first. Trace only the stages that can affect the requested target: input selection, preprocessing or calibration, model or method, aggregation or statistics, and visual encoding.
+Read the caption, target-relevant paper sections, supplement and availability statements, and supplied or already-local files first. Trace only the stages that can affect the requested target: input selection, preprocessing or calibration, model or method, aggregation or statistics, and visual encoding. Bind the exact target to an entry point, input, consequential parameters, and output before treating related author code as its implementation.
 
 Name the unresolved fact and the decision it can change. Investigate it only when the answer matters. Do not audit an entire paper, repository, computer, or software ecosystem for completeness.
 
@@ -18,42 +18,44 @@ Use sources in this order when applicable:
 4. a verified archive;
 5. a clearly labelled third-party source.
 
-Search the network only when local evidence is insufficient, a specific authoritative source is likely to answer the question, and either finding the artifact or confirming its absence changes the next action. Use focused queries for the named artifact, not broad topic or reverse-image archaeology. Inspect metadata, identity, version, access terms, license, format, and likely relevance before downloading. Retrieve the smallest necessary artifact and remember that public access does not imply redistribution permission.
-
-For material sources, retain internally a safe locator, version or commit, checked date, hash when useful, authority, access state, license, and redistribution boundary.
+Search only when local evidence is insufficient, an authoritative source is likely to answer the named question, and the answer changes the next action. Check identity, version, access terms, license, format, and relevance before retrieving the smallest necessary artifact; public access does not imply redistribution permission. Retain material source identity and rights internally.
 
 ## Check source and code minimally
 
-Author code and its native data format are usually strongest for exact recomputation, but they are not automatically required for claim-equivalent reproduction. First determine which source actually implements each target-producing stage. Hosting ownership alone does not decide the route: a paper-identified third-party implementation may support direct recomputation when evidence shows that it produced the target; otherwise related third-party code is alternative evidence. Missing original input does not make an independently usable author method irrelevant, and code from another figure does not establish this target's workflow.
+Author code and its native data format are usually strongest for author-workflow recomputation, but they are not automatically required for every independent or claim-equivalent test. First determine which source actually implements each target-producing stage. Hosting ownership alone does not decide the route: a paper-identified third-party implementation may support direct recomputation when evidence shows that it produced the target; otherwise related third-party code is alternative evidence. Code from another figure does not establish this target's workflow.
 
-Inspect code statically before execution. Limit review to target-relevant entry points, dependencies, defaults, randomness, input and output formats, preprocessing, aggregation, plotting transforms, network or system effects, install hooks, binaries, unsafe deserialization, and telemetry. `scripts/inspect_artifact.py` may help with deterministic non-executing inspection.
+Track method provenance and input identity independently. Missing exact input does not make a target-relevant author method irrelevant: native source may still be run on a paper-defined simulation or declared substitute. That supports the author method under the stated input, not exact regeneration of the published target. Conversely, exact input with a translated implementation is a same-input independent route, not author-native recomputation.
+
+Inspect target-relevant entry points, dependencies, defaults, randomness, I/O, preprocessing, aggregation, plotting transforms, and unsafe external effects before execution. `scripts/inspect_artifact.py` can assist without running the artifact.
 
 Use the smallest reviewed smoke test that can establish whether the chosen stage runs. A smoke test proves capability, not reproduction. Keep compatibility changes small and state whether they alter scientific behavior.
 
 ## Establish data identity
 
-Match data by evidence, not filename or topic. Check only the fields needed to identify the paper case: variables and units, sampling, duration, channels or specimen/device identifiers, split or segment, preprocessing and calibration, version, hash when useful, license, and restrictions.
+Match data by evidence, not filename or topic. Check only identity fields that can distinguish the paper case, such as variables, units, sampling, split or segment, preprocessing, version, rights, and a hash when useful.
 
 Classify the input honestly as exact original, official example, paper-defined simulation, declared substitute, or unavailable/restricted. A substitute may support a narrower mechanism or robustness claim, but it does not become the original experiment.
 
 ## Check formulas where they affect the result
 
-Verify only mathematical details that can change an observable or acceptance decision: definitions, units, dimensions and shapes, indexing, signs, normalization, initial or boundary conditions, admissible ranges, and target-relevant parameter values.
+Verify only details that can change an observable or decision: definitions, units, shapes, indexing, signs, normalization, boundary conditions, ranges, and target-relevant values.
 
 When paper and code differ materially, preserve both readings. Compare them if both answer the objective, ask when the choice changes the supported claim, or narrow/block the affected claim when neither can be justified. Never silently correct an expression or choose the interpretation that most resembles the published image.
 
-## Test only the runtime the route needs
+## Preserve the native route when it serves the objective
 
-Decide first whether native execution matters. It matters when the user requests the author workflow or artifact, or when runtime-specific behavior is claim-defining. Otherwise a transparent independent implementation may be the stronger and simpler scientific test.
+For author-workflow reproduction, preserve the author language, source path, and native runtime by default when the target mapping is credible and a compatible existing environment is usable. This avoids an unnecessary port and keeps the delivered source aligned with the executed route. Do not translate merely because another language is familiar or its ecosystem is easier to package.
 
-Identify the native runtime from affirmative evidence such as author documentation, a launcher or manifest, dependencies, and target-relevant syntax. A filename extension or data format alone is insufficient. Prefer an existing compatible environment and inspect only the packages, functions, licenses, and hardware required by the chosen route. Use `scripts/probe_environment.py` only when a focused probe can resolve a live uncertainty.
+Native execution is not a universal requirement. A transparent independent implementation may be primary when the user requests portability or independence, when a materially different implementation is the scientific test, or when the native route is genuinely unavailable, unsafe, or incapable of the target operation. State the reason and changed evidence boundary; do not present a port as author-native execution.
 
-A discovered installation does not prove that its license, packages, entry point, data, or target operation works. After static review, run the smallest safe target-relevant operation. A failed or timed-out probe is inconclusive rather than proof of absence. Follow [permission-gates.md](permission-gates.md) before any login, activation, installation, privileged action, shared license, remote execution, or binary with uncertain effects.
+Identify the runtime from author documentation, a launcher or manifest, dependencies, and target-relevant syntax; an extension or data format alone is insufficient. Prefer an existing compatible environment and inspect only prerequisites required by the route. Use `scripts/probe_environment.py` only to resolve a consequential live uncertainty.
+
+A discovered installation does not prove that its license, packages, entry point, data, or target operation works. After static review, run the smallest safe target-relevant operation. An already-installed and already-activated proprietary runtime may be used when this requires no new agreement, login, payment, activation, shared license, privilege, or remote service. A failed or timed-out probe is inconclusive rather than proof of absence. Follow [permission-gates.md](permission-gates.md) before any new authority or uncertain system effect.
 
 ## Preserve the evidence boundary and stop
 
-State whether the route is direct recomputation, mechanism reproduction, or alternative validation. For every substitution, state why it serves the objective, what evidence boundary changes, and which compatibility checks support it. Never imply equivalence merely because two implementations run.
+State the route and, for every substitution, why it serves the objective, what boundary changes, and what compatibility evidence supports it. Two implementations running does not establish equivalence.
 
 Stop when the route is scientifically defensible, remaining gaps cannot change acceptance, the strongest relevant authority confirms absence or restriction, or another check cannot change the next action. After one bounded authoritative pass, do not widen the search merely to recover an unavailable exact realization. Use a transparent narrower route when it still answers the objective, or report the exact-original case as blocked.
 
-Keep discarded sources, inventories, probe transcripts, and diagnostic logs internal. Deliver only source and data identities needed to rerun, actual dependencies, material substitutions, rights, and unresolved capability limits.
+Keep discarded sources, inventories, probes, and logs internal. Deliver only identities needed to rerun, dependencies, substitutions, rights, and material limits.
