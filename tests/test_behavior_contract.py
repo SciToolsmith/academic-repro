@@ -39,6 +39,7 @@ class BehaviorContractTests(unittest.TestCase):
         self.assertIn("Continue only when the next check can distinguish a cause", validation)
 
     def test_default_delivery_is_result_first_and_route_consistent(self) -> None:
+        entrypoint = self.read("SKILL.md")
         delivery = self.read("references/delivery-contract.md")
 
         self.assertIn("in the language and runtime used", delivery)
@@ -47,6 +48,12 @@ class BehaviorContractTests(unittest.TestCase):
         self.assertIn("regenerable intermediate CSV/JSON outputs", delivery)
         self.assertIn("Do not replace the executed native source with an unrelated port", delivery)
         self.assertIn("evidence records and clean-rerun receipts internal", delivery)
+        self.assertIn("one folder per reproduction unit", entrypoint)
+        self.assertIn("meaningful target-specific entrypoint", entrypoint)
+        self.assertIn("root launcher may coordinate units but cannot be the sole implementation path", entrypoint)
+        self.assertIn("root `README.md` as a short index", delivery)
+        self.assertIn("at least two units actually use it", delivery)
+        self.assertIn("A blocked unit", delivery)
 
     def test_existing_activated_proprietary_runtime_does_not_trigger_an_automatic_pause(self) -> None:
         permissions = self.read("references/permission-gates.md")
