@@ -299,7 +299,7 @@ def main() -> int:
     root_sensitive = sensitive_entry_name(path.name)
 
     report = {
-        "schemaVersion": "scirepro.artifact/v2",
+        "schemaVersion": "academic-repro.artifact/v2",
         "path": "$ARTIFACT",
         "name": display_entry_name(path.name),
         "type": (

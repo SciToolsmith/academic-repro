@@ -1,4 +1,4 @@
 interface:
   display_name: "Academic Repro"
-  short_description: "复现科研图表背后的计算过程，并检验论文论点是否保持"
-  default_prompt: "Use $academic-repro to classify each target by how it was generated and its evidence role, rebuild the smallest credible data-to-result process, validate credible generation, local-claim preservation, and visual-semantic preservation, then deliver only the rerunnable result and necessary files."
+  short_description: "复现或评估论文中的计算图表与定量结果，并明确科学证据边界"
+  default_prompt: "Use $academic-repro to assess or reproduce this paper target, state the evidence basis and limits first, and create or package artifacts only when requested."

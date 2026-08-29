@@ -24,7 +24,7 @@ For material sources, retain internally a safe locator, version or commit, check
 
 ## Check source and code minimally
 
-Author code and its native data format are usually strongest for exact recomputation, but they are not automatically required for claim-equivalent reproduction. First determine which source actually implements each target-producing stage. Missing original input does not make an independently usable author method irrelevant, and code from another figure does not establish this target's workflow.
+Author code and its native data format are usually strongest for exact recomputation, but they are not automatically required for claim-equivalent reproduction. First determine which source actually implements each target-producing stage. Hosting ownership alone does not decide the route: a paper-identified third-party implementation may support direct recomputation when evidence shows that it produced the target; otherwise related third-party code is alternative evidence. Missing original input does not make an independently usable author method irrelevant, and code from another figure does not establish this target's workflow.
 
 Inspect code statically before execution. Limit review to target-relevant entry points, dependencies, defaults, randomness, input and output formats, preprocessing, aggregation, plotting transforms, network or system effects, install hooks, binaries, unsafe deserialization, and telemetry. `scripts/inspect_artifact.py` may help with deterministic non-executing inspection.
 

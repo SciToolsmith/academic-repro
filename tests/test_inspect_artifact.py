@@ -34,7 +34,7 @@ class InspectArtifactTests(unittest.TestCase):
             self.assertEqual(completed.returncode, 0, completed.stderr)
             self.assertNotIn(temporary, completed.stdout)
             report = json.loads(completed.stdout)
-            self.assertEqual(report["schemaVersion"], "scirepro.artifact/v2")
+            self.assertEqual(report["schemaVersion"], "academic-repro.artifact/v2")
             self.assertEqual(report["type"], "file")
             self.assertRegex(report["sha256"], r"^[0-9a-f]{64}$")
 

@@ -28,12 +28,19 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
 try:
+    from .evidence_record import EvidenceError, artifact_set_digest, load_record
     from .safe_output import SafeOutputError, checked_directory_create_only
 except ImportError:  # Direct script execution.
+    from evidence_record import EvidenceError, artifact_set_digest, load_record
     from safe_output import SafeOutputError, checked_directory_create_only
 
 
-PLAN_SCHEMA = "scirepro.delivery-plan/v4"
+PLAN_SCHEMA = "academic-repro.delivery-plan/v5"
+SUPPORTED_PLAN_SCHEMAS = {
+    PLAN_SCHEMA,
+    "academic-repro.delivery-plan/v4",
+    "scirepro.delivery-plan/v4",
+}
 MAX_PLAN_BYTES = 1024 * 1024
 MAX_FILE_BYTES = 256 * 1024 * 1024
 MAX_TOTAL_BYTES = 1024 * 1024 * 1024
@@ -60,8 +67,18 @@ VALIDATION_STATUSES = {
     "passed", "partially-passed", "failed", "inconclusive", "not-run",
 }
 CLAIM_STATUSES = {
-    "supported", "partially-supported", "unsupported", "inconclusive",
+    "supported", "mechanism-consistent", "partially-supported", "unsupported", "inconclusive",
     "not-tested", "not-applicable",
+}
+EVIDENCE_ROUTE_BASES = {
+    "direct-recompute": {
+        "author-native-recompute", "same-input-independent", "mathematical-cross-check",
+    },
+    "mechanism-reproduction": {"mechanism-consistency"},
+    "alternative-validation": {
+        "same-input-independent", "new-data-replication",
+        "alternative-method-robustness", "mathematical-cross-check",
+    },
 }
 RIGHTS_STATUSES = {
     "generated", "included-permitted", "public-domain", "local-only",
@@ -86,6 +103,7 @@ ALWAYS_TRANSIENT_NAME = re.compile(
 PROCESS_RECORD_NAME = re.compile(
     r"(?i)(?:^|[._-])(?:"
     r"manifest|"
+    r"evidence(?:[-_]?(?:record|bundle|report))?|"
     r"(?:environment|runtime|installed|package)(?:[-_][a-z0-9]+)*"
     r"[-_](?:packages|inventory|snapshot)|"
     r"(?:runtime|environment|route|matlab|license|capability)[-_]?probe|"
@@ -148,6 +166,7 @@ SLUG = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$")
 TARGET_ID = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,126}[A-Za-z0-9])?$")
 ENGINE_ID = re.compile(r"^[a-z][a-z0-9+._-]{0,63}$")
 OUTPUT_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._+-]{0,127}$")
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 SENSITIVE_NAME = re.compile(
     r"(?i)^(?:\.env(?:\..*)?|id_[rd]sa(?:\.pub)?|credentials?(?:\..*)?|"
     r"secrets?(?:\..*)?|tokens?(?:\..*)?|.*private[_-]?key.*)$"
@@ -519,6 +538,19 @@ def _resolve_source(raw: object, plan_path: Path, label: str) -> Path:
         same_as_plan = resolved == plan_path.resolve()
     require(not same_as_plan, "the internal delivery plan may not be copied")
     return resolved
+
+
+def _parse_evidence_reference(value: object, plan_path: Path, label: str) -> tuple[dict, str]:
+    require(isinstance(value, dict), f"{label} must be an object")
+    _ensure_keys(value, {"source", "sha256"}, {"source", "sha256"}, label)
+    expected = _single_line(value["sha256"], f"{label}.sha256", 64)
+    require(SHA256.fullmatch(expected) is not None, f"{label}.sha256 must be a lowercase SHA-256 digest")
+    source = _resolve_source(value["source"], plan_path, label)
+    try:
+        record, digest = load_record(source, expected)
+    except EvidenceError as exc:
+        raise DeliveryError(f"{label} is invalid: {exc}") from exc
+    return record, digest
 
 
 def _parse_copy(
@@ -942,6 +974,29 @@ def _stage_label(stage: str) -> str:
     }[stage]
 
 
+def _evidence_basis_label(value: str) -> str:
+    return {
+        "author-native-recompute": "Author-native recomputation",
+        "same-input-independent": "Same-input independent implementation",
+        "mechanism-consistency": "Mechanism consistency",
+        "new-data-replication": "New-data replication",
+        "alternative-method-robustness": "Alternative-method robustness",
+        "mathematical-cross-check": "Mathematical cross-check",
+    }[value]
+
+
+def _claim_status_label(value: str) -> str:
+    return {
+        "supported": "Supported for the declared local claim",
+        "mechanism-consistent": "Mechanism-consistent only",
+        "partially-supported": "Partially supported",
+        "unsupported": "Unsupported by the declared test",
+        "inconclusive": "Inconclusive",
+        "not-tested": "Not tested",
+        "not-applicable": "Not applicable",
+    }[value]
+
+
 def _deduplicated_lines(*groups: Sequence[str]) -> List[str]:
     result: List[str] = []
     seen: set[str] = set()
@@ -982,6 +1037,15 @@ def _build_readme(plan: dict, targets: List[dict], licenses: List[CopyArtifact])
             "",
             _markdown(target["conclusion"]),
         ])
+        if target["evidenceBasis"] is not None:
+            lines.extend([
+                "",
+                f"**Evidence basis:** {_markdown(_evidence_basis_label(target['evidenceBasis']))}",
+                "",
+                f"**Scientific status:** {_markdown(_claim_status_label(target['claimStatus']))}",
+            ])
+            if target["evidenceRecord"]["cleanRerun"]["status"] == "passed":
+                lines.extend(["", "**Clean rerun:** Verified from a fresh copy."])
         material_substitutions = [
             decision
             for decision in target["stageDecisions"]
@@ -1153,6 +1217,11 @@ def _validate_statuses(target: dict) -> None:
             operational == "complete" and validation == "passed",
             f"{target['id']} supported requires complete execution and passed validation",
         )
+    elif claim == "mechanism-consistent":
+        require(
+            operational == "complete" and validation == "passed",
+            f"{target['id']} mechanism-consistent requires complete execution and passed validation",
+        )
     elif claim == "partially-supported":
         require(
             operational in {"complete", "partial"} and validation == "partially-passed",
@@ -1207,6 +1276,100 @@ def _validate_route(target: dict) -> None:
             operational == "blocked" and target["validationStatus"] == "not-run",
             f"{target['id']} original-case-blocked requires blocked execution and validation not-run",
         )
+    if target["claimStatus"] == "mechanism-consistent":
+        require(
+            route == "mechanism-reproduction",
+            f"{target['id']} mechanism-consistent claim requires mechanism-reproduction",
+        )
+
+
+def _validate_evidence_binding(target: dict, record: dict, *, require_clean_rerun: bool) -> None:
+    status = record["status"]
+    clean_rerun = record["cleanRerun"]
+
+    require(record["targetId"] == target["id"], f"{target['id']} evidence target id does not match")
+    allowed_bases = EVIDENCE_ROUTE_BASES.get(target["route"], set())
+    require(
+        record["evidenceBasis"] in allowed_bases,
+        f"{target['id']} evidence basis {record['evidenceBasis']} is incompatible with route {target['route']}",
+    )
+    require(status["operational"] == target["operationalStatus"], f"{target['id']} evidence execution status does not match")
+    require(status["validation"] == target["validationStatus"], f"{target['id']} evidence validation status does not match")
+    require(status["claim"] == target["claimStatus"], f"{target['id']} evidence claim status does not match")
+
+    role_map = {
+        "sourceFiles": "source",
+        "configFiles": "configuration",
+        "inputFiles": "input",
+        "modelFiles": "model",
+        "environmentFiles": "environment",
+    }
+    artifact_entries: List[dict] = []
+    bound: Dict[str, str] = {}
+
+    def bind(link: ArtifactLink, role: str) -> None:
+        require(
+            link.source is not None,
+            f"{target['id']} evidence-bound artifact has no resolved source: {link.destination}",
+        )
+        path = link.destination.as_posix()
+        digest = _sha256(link.source)
+        previous = bound.get(path)
+        require(previous is None or previous == digest, f"{target['id']} has conflicting bytes for {path}")
+        bound[path] = digest
+        artifact_entries.append({"role": role, "path": path, "sha256": digest})
+
+    for field, role in role_map.items():
+        for link in target["roleLinks"][field]:
+            bind(link, role)
+
+    expected_outputs = set(target["rerunOutputs"])
+    output_links: Dict[str, ArtifactLink] = {}
+    if target["mainLink"] is not None:
+        output_links[target["mainLink"].destination.as_posix()] = target["mainLink"]
+    output_links.update({
+        link.destination.as_posix(): link
+        for link in target["roleLinks"]["requestedExtras"]
+    })
+    for path in sorted(expected_outputs):
+        require(path in output_links, f"{target['id']} rerun output is not a delivered result: {path}")
+        bind(output_links[path], "output")
+
+    try:
+        expected_set_digest = artifact_set_digest(artifact_entries)
+    except EvidenceError as exc:
+        raise DeliveryError(f"{target['id']} could not bind its artifact set: {exc}") from exc
+    require(
+        record["artifactSetDigest"] == expected_set_digest,
+        f"{target['id']} evidence artifact-set digest does not match the delivered target",
+    )
+
+    criterion_outputs = {
+        path for criterion in record["criteria"] for path in criterion["evidenceOutputs"]
+    }
+    require(
+        criterion_outputs.issubset(expected_outputs),
+        f"{target['id']} evidence criteria reference outputs outside rerunOutputs",
+    )
+
+    require(target["mainLink"] is not None, f"{target['id']} machine-bound evidence requires a primary result")
+    main_path = target["mainLink"].destination.as_posix()
+    require(main_path in expected_outputs, f"{target['id']} evidence outputs omit the primary result")
+    if require_clean_rerun:
+        require(clean_rerun["status"] == "passed", f"{target['id']} v5 delivery requires a passed clean rerun")
+        require(clean_rerun["argv"] == target["rerunArgv"], f"{target['id']} clean-rerun argv does not match")
+        clean_outputs = {item["path"]: item["sha256"] for item in clean_rerun["outputs"]}
+        require(
+            set(clean_outputs) == expected_outputs,
+            f"{target['id']} clean-rerun outputs do not match rerunOutputs",
+        )
+        if clean_rerun["matchPolicy"] == "exact-sha256":
+            for path, digest in clean_outputs.items():
+                require(
+                    digest == bound[path],
+                    f"{target['id']} clean-rerun output digest mismatch: {path}",
+                )
+    target["evidenceBasis"] = record["evidenceBasis"]
 
 
 def _validate_stage_decisions(raw: object, target: dict, label: str) -> List[dict]:
@@ -1351,7 +1514,12 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
         {"schemaVersion", "title", "slug", "distribution", "conclusion", "targets"},
         "delivery plan",
     )
-    require(plan["schemaVersion"] == PLAN_SCHEMA, f"unsupported plan schema: {plan['schemaVersion']}")
+    plan_schema = plan["schemaVersion"]
+    require(
+        isinstance(plan_schema, str) and plan_schema in SUPPORTED_PLAN_SCHEMAS,
+        f"unsupported plan schema: {plan_schema}",
+    )
+    machine_bound_plan = plan_schema == PLAN_SCHEMA
     plan["title"] = _human_line(plan["title"], "title", 200)
     plan["conclusion"] = _human_line(plan["conclusion"], "conclusion", 1000)
     slug = _single_line(plan["slug"], "slug", 64)
@@ -1475,7 +1643,8 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
                 "claimStatus", "route", "stageDecisions", "validationBasis", "materialAssumptions",
                 "blocker", "conclusion", "mainResult",
                 *DELIVERY_ROLE_FIELDS,
-                "entrypoint", "rerunOutputs", "dependencyNote", "rerunArgv", "limitations", "rights",
+                "entrypoint", "rerunOutputs", "dependencyNote", "rerunArgv",
+                "evidenceRecord", "limitations", "rights",
             },
             {
                 "id", "title", "kind", "operationalStatus", "validationStatus",
@@ -1513,6 +1682,10 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
             "rights": _human_line(raw_target["rights"], f"{label}.rights", 1000),
             "dependencyNote": None,
             "blocker": None,
+            "evidenceRecord": None,
+            "evidenceRecordRaw": raw_target.get("evidenceRecord"),
+            "evidenceRecordDigest": None,
+            "evidenceBasis": None,
             "destinationParent": (
                 Path() if len(plan["targets"]) == 1 else Path(target_id)
             ),
@@ -1647,6 +1820,29 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
                 f"{target_id} reconstruction without sourceFiles must deliver an editable main result",
             )
         _validate_rerun_paths(target)
+        if target["evidenceRecordRaw"] is not None:
+            target["evidenceRecord"], target["evidenceRecordDigest"] = _parse_evidence_reference(
+                target["evidenceRecordRaw"], plan_path, f"{label}.evidenceRecord"
+            )
+        machine_evidence_required = (
+            successful_scientific and target["validationStatus"] != "not-run"
+        )
+        if machine_bound_plan and machine_evidence_required:
+            require(
+                target["evidenceRecord"] is not None,
+                f"{target_id} validated v5 scientific delivery requires evidenceRecord",
+            )
+        if target["evidenceRecord"] is not None:
+            require(
+                target["kind"] in {"quantitative", "other"}
+                and target["route"] != "original-case-blocked",
+                f"{target_id} evidenceRecord is currently supported only for executed scientific targets",
+            )
+            _validate_evidence_binding(
+                target,
+                target["evidenceRecord"],
+                require_clean_rerun=machine_bound_plan and machine_evidence_required,
+            )
         targets.append(target)
 
     if len(targets) == 1:
@@ -1706,6 +1902,15 @@ def assemble(plan_path: Path, output_root: Path) -> Path:
     require(
         all(item.digest != plan_digest for item in copies),
         "the internal delivery plan content may not be copied",
+    )
+    evidence_digests = {
+        target["evidenceRecordDigest"]
+        for target in targets
+        if target["evidenceRecordDigest"] is not None
+    }
+    require(
+        all(item.digest not in evidence_digests for item in copies),
+        "an internal evidence record may not be copied into the customer delivery",
     )
     destinations: Dict[str, CopyArtifact] = {}
     digests: Dict[str, CopyArtifact] = {}

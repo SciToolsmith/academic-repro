@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import io
 import os
@@ -14,7 +15,11 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 ASSEMBLER = REPO / "academic-repro/scripts/assemble_delivery.py"
+SCRIPTS = REPO / "academic-repro" / "scripts"
 MAX_FILE_BYTES = 256 * 1024 * 1024
+sys.path.insert(0, str(SCRIPTS))
+
+from evidence_record import artifact_set_digest  # noqa: E402
 
 
 def run_assembler(plan: Path, output_root: Path, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -197,6 +202,164 @@ class Fixture:
             "rights": "No third-party file is included.",
         }
 
+    def _evidence_artifact(
+        self,
+        value: dict,
+        prefix: str,
+        common_by_name: dict[str, dict],
+        role: str,
+    ) -> dict:
+        if "commonRef" in value:
+            name = value["commonRef"]
+            source_value = common_by_name[name]
+            destination = f"common/{name}"
+        else:
+            source_value = value
+            destination = f"{prefix}{value['name']}"
+        source = self.root / source_value["source"]
+        return {
+            "role": role,
+            "path": destination,
+            "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        }
+
+    def _attach_evidence(
+        self,
+        target: dict,
+        prefix: str,
+        common_by_name: dict[str, dict],
+    ) -> None:
+        if target.get("evidenceRecord") is not None:
+            return
+        if (
+            target.get("kind") not in {"quantitative", "other"}
+            or target.get("route") == "original-case-blocked"
+            or target.get("operationalStatus") not in {"complete", "partial"}
+            or target.get("validationStatus") == "not-run"
+            or not target.get("sourceFiles")
+            or target.get("mainResult") is None
+            or not target.get("rerunArgv")
+            or not target.get("entrypoint")
+            or not target.get("rerunOutputs")
+        ):
+            return
+        try:
+            role_map = {
+                "sourceFiles": "source",
+                "configFiles": "configuration",
+                "inputFiles": "input",
+                "modelFiles": "model",
+                "environmentFiles": "environment",
+            }
+            artifact_entries = [
+                self._evidence_artifact(item, prefix, common_by_name, artifact_role)
+                for field, artifact_role in role_map.items()
+                for item in target[field]
+            ]
+            result_ref = self._evidence_artifact(
+                target["mainResult"], prefix, common_by_name, "output"
+            )
+            output_candidates = [target["mainResult"], *target["requestedExtras"]]
+            outputs = [
+                self._evidence_artifact(item, prefix, common_by_name, "output")
+                for item in output_candidates
+                if "name" in item and f"{prefix}{item['name']}" in target["rerunOutputs"]
+            ]
+            artifact_entries.extend(outputs)
+            artifact_digest = artifact_set_digest(artifact_entries)
+        except (KeyError, OSError, TypeError, ValueError):
+            return
+
+        route = target["route"]
+        basis_by_route = {
+            "direct-recompute": "same-input-independent",
+            "mechanism-reproduction": "mechanism-consistency",
+            "alternative-validation": "alternative-method-robustness",
+        }
+        if route not in basis_by_route:
+            return
+        evidence_basis = basis_by_route[route]
+        discriminating_mechanism = (
+            route == "mechanism-reproduction" and target["claimStatus"] == "supported"
+        )
+        criterion_role = "mechanism-discrimination" if discriminating_mechanism else "acceptance"
+        criterion_independent = discriminating_mechanism
+        result_status = {
+            "passed": "passed",
+            "partially-passed": "partially-passed",
+            "failed": "failed",
+            "inconclusive": "inconclusive",
+        }[target["validationStatus"]]
+        environment_digest = hashlib.sha256(
+            json.dumps(
+                [item for item in artifact_entries if item["role"] == "environment"],
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()
+        record = {
+            "schemaVersion": "academic-repro.evidence/v1",
+            "targetId": target["id"],
+            "evidenceBasis": evidence_basis,
+            "claim": f"The declared observable for {target['id']} satisfies its criterion.",
+            "sourceIdentity": {
+                "role": "supplied-artifact",
+                "locator": f"Fixture target {target['id']}",
+                "sha256": result_ref["sha256"],
+            },
+            "artifactSetDigest": artifact_digest,
+            "criteria": [{
+                "id": "criterion-1",
+                "statement": "Evaluate the declared observable against the frozen target criterion.",
+                "authority": "paper",
+                "purpose": "scientific-validity",
+                "frozenBeforeRun": True,
+                "evidenceRole": criterion_role,
+                "status": result_status,
+                "expected": "The frozen criterion is satisfied.",
+                "observed": "The fixture validation produced the declared status.",
+                "evidenceOutputs": [result_ref["path"]],
+                "independentFromCalibration": criterion_independent,
+            }],
+            "status": {
+                "operational": target["operationalStatus"],
+                "validation": target["validationStatus"],
+                "claim": target["claimStatus"],
+            },
+            "cleanRerun": {
+                "status": "passed",
+                "argv": target["rerunArgv"],
+                "environmentDigest": environment_digest,
+                "freshWorkspace": True,
+                "outputsRemovedBeforeRun": True,
+                "outputs": [
+                    {"path": item["path"], "sha256": item["sha256"]}
+                    for item in outputs
+                ],
+                "matchPolicy": "exact-sha256",
+                "validatedCriteria": [],
+            },
+        }
+        record_path = self.file(
+            f"{target['id']}/evidence-record.json",
+            json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
+        )
+        target["evidenceRecord"] = {
+            "source": record_path.relative_to(self.root).as_posix(),
+            "sha256": hashlib.sha256(record_path.read_bytes()).hexdigest(),
+        }
+
+    def sync_evidence_argv(self, plan_value: dict, target_index: int = 0) -> None:
+        target = plan_value["targets"][target_index]
+        reference = target["evidenceRecord"]
+        record_path = self.root / reference["source"]
+        record = json.loads(record_path.read_text(encoding="utf-8"))
+        record["cleanRerun"]["argv"] = target["rerunArgv"]
+        record_path.write_text(
+            json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n",
+            encoding="utf-8",
+        )
+        reference["sha256"] = hashlib.sha256(record_path.read_bytes()).hexdigest()
+
     def plan(
         self,
         targets: list[dict],
@@ -207,6 +370,10 @@ class Fixture:
         licenses: list[dict] | None = None,
     ) -> Path:
         multiple = len(targets) > 1
+        common_values = common or []
+        common_by_name = {
+            item["name"]: item for item in common_values if isinstance(item, dict) and "name" in item
+        }
         for target in targets:
             executable_name = target.pop("_rerunExecutable", None)
             executable_command = target.pop("_rerunCommand", None)
@@ -222,14 +389,16 @@ class Fixture:
                 target["rerunOutputs"] = [
                     f"{prefix}{target['mainResult']['name']}"
                 ]
+            prefix = f"{target['id']}/" if multiple else ""
+            self._attach_evidence(target, prefix, common_by_name)
         value = {
-            "schemaVersion": "scirepro.delivery-plan/v4",
+            "schemaVersion": "academic-repro.delivery-plan/v5",
             "title": "Example scientific reproduction",
             "slug": slug,
             "distribution": distribution,
             "conclusion": "The final conclusions are reported without hiding negative results.",
             "targets": targets,
-            "common": common or [],
+            "common": common_values,
             "licenses": licenses or [],
         }
         path = self.root / "delivery-plan.json"
@@ -264,6 +433,9 @@ class DeliveryAssemblerTests(unittest.TestCase):
             self.assertNotIn("`direct-recompute`", readme)
             self.assertNotIn("engineDecision", readme)
             self.assertNotIn("nativeCapability", readme)
+            self.assertIn("Same-input independent implementation", readme)
+            self.assertIn("Supported for the declared local claim", readme)
+            self.assertIn("Verified from a fresh copy", readme)
             self.assertIn("[result.png](result.png)", readme)
             self.assertIn("![result.png](result.png)", readme)
             self.assertIn("python3 reproduce.py --config parameters.json", readme)
@@ -282,6 +454,73 @@ class DeliveryAssemblerTests(unittest.TestCase):
             (delivery / ".DS_Store").write_bytes(b"created later")
             self.assertEqual((delivery / "README.md").read_text(encoding="utf-8"), readme)
             self.assertFalse(any(path.is_dir() and not any(path.iterdir()) for path in delivery.rglob("*")))
+
+    def test_v5_requires_compact_evidence_while_v4_remains_lightweight(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            plan = fixture.plan([fixture.target("fig-01")])
+            value = json.loads(plan.read_text(encoding="utf-8"))
+            value["targets"][0].pop("evidenceRecord")
+            plan.write_text(json.dumps(value), encoding="utf-8")
+
+            rejected = run_assembler(plan, root / "v5", check=False)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertIn("validated v5 scientific delivery requires evidenceRecord", rejected.stderr)
+
+            value["schemaVersion"] = "academic-repro.delivery-plan/v4"
+            plan.write_text(json.dumps(value), encoding="utf-8")
+            delivery = Path(json.loads(run_assembler(plan, root / "v4").stdout)["path"])
+            self.assertTrue((delivery / "result.png").is_file())
+            self.assertNotIn("Evidence basis", (delivery / "README.md").read_text(encoding="utf-8"))
+
+    def test_v5_evidence_binds_real_artifacts_and_clean_rerun_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            plan = fixture.plan([fixture.target("fig-01")])
+            value = json.loads(plan.read_text(encoding="utf-8"))
+            source = root / value["targets"][0]["sourceFiles"][0]["source"]
+            source.write_text("print('changed after evidence')\n", encoding="utf-8")
+
+            rejected = run_assembler(plan, root / "artifact-tamper", check=False)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertIn("artifact-set digest does not match", rejected.stderr)
+
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            plan = fixture.plan([fixture.target("fig-01")])
+            value = json.loads(plan.read_text(encoding="utf-8"))
+            reference = value["targets"][0]["evidenceRecord"]
+            record_path = root / reference["source"]
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+            record["cleanRerun"]["outputs"][0]["sha256"] = "0" * 64
+            record_path.write_text(json.dumps(record), encoding="utf-8")
+            reference["sha256"] = hashlib.sha256(record_path.read_bytes()).hexdigest()
+            plan.write_text(json.dumps(value), encoding="utf-8")
+
+            rejected = run_assembler(plan, root / "receipt-tamper", check=False)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertIn("clean-rerun output digest mismatch", rejected.stderr)
+
+    def test_v5_evidence_criteria_must_point_to_declared_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            fixture = Fixture(root)
+            plan = fixture.plan([fixture.target("fig-01")])
+            value = json.loads(plan.read_text(encoding="utf-8"))
+            reference = value["targets"][0]["evidenceRecord"]
+            record_path = root / reference["source"]
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+            record["criteria"][0]["evidenceOutputs"] = ["unbound.png"]
+            record_path.write_text(json.dumps(record), encoding="utf-8")
+            reference["sha256"] = hashlib.sha256(record_path.read_bytes()).hexdigest()
+            plan.write_text(json.dumps(value), encoding="utf-8")
+
+            rejected = run_assembler(plan, root / "out", check=False)
+            self.assertEqual(rejected.returncode, 2)
+            self.assertIn("criteria reference outputs outside rerunOutputs", rejected.stderr)
 
     def test_requested_extra_requires_an_explicit_customer_purpose(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
@@ -329,7 +568,7 @@ class DeliveryAssemblerTests(unittest.TestCase):
                 self.assertEqual(rejected.returncode, 2)
                 self.assertIn("internal process evidence", rejected.stderr)
 
-    def test_v4_roles_reject_process_evidence_and_old_schema(self) -> None:
+    def test_v4_roles_accept_legacy_brand_and_reject_process_evidence_and_old_schema(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)
             fixture = Fixture(root)
@@ -341,6 +580,14 @@ class DeliveryAssemblerTests(unittest.TestCase):
             self.assertEqual(rejected.returncode, 2)
             self.assertIn("internal process evidence", rejected.stderr)
 
+            legacy = fixture.target("fig-legacy", reference=False)
+            legacy_plan = fixture.plan([legacy], slug="legacy-brand")
+            legacy_value = json.loads(legacy_plan.read_text(encoding="utf-8"))
+            legacy_value["schemaVersion"] = "scirepro.delivery-plan/v4"
+            legacy_plan.write_text(json.dumps(legacy_value), encoding="utf-8")
+            accepted = run_assembler(legacy_plan, root / "legacy")
+            self.assertTrue(Path(json.loads(accepted.stdout)["path"]).is_dir())
+
             clean = fixture.target("fig-02", reference=False)
             old_plan = fixture.plan([clean], slug="old-plan")
             value = json.loads(old_plan.read_text(encoding="utf-8"))
@@ -349,6 +596,17 @@ class DeliveryAssemblerTests(unittest.TestCase):
             rejected = run_assembler(old_plan, root / "old", check=False)
             self.assertEqual(rejected.returncode, 2)
             self.assertIn("unsupported plan schema", rejected.stderr)
+
+            malformed_plan = fixture.plan(
+                [fixture.target("fig-malformed", reference=False)], slug="malformed-plan"
+            )
+            malformed_value = json.loads(malformed_plan.read_text(encoding="utf-8"))
+            malformed_value["schemaVersion"] = []
+            malformed_plan.write_text(json.dumps(malformed_value), encoding="utf-8")
+            malformed = run_assembler(malformed_plan, root / "malformed", check=False)
+            self.assertEqual(malformed.returncode, 2)
+            self.assertIn("unsupported plan schema", malformed.stderr)
+            self.assertNotIn("Traceback", malformed.stderr)
 
         for name, role in (
             ("environment-python-miniforge-packages.json", "environmentFiles"),
@@ -673,6 +931,7 @@ class DeliveryAssemblerTests(unittest.TestCase):
             value["targets"][0]["rerunArgv"] = [
                 "python3", "-I", "-B", "reproduce.py", "--config", "parameters.json",
             ]
+            fixture.sync_evidence_argv(value)
             plan.write_text(json.dumps(value), encoding="utf-8")
             delivery = Path(json.loads(run_assembler(plan, root / "out").stdout)["path"])
             readme = (delivery / "README.md").read_text(encoding="utf-8")

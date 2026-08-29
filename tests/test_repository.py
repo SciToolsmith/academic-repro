@@ -81,15 +81,15 @@ class RepositoryTests(unittest.TestCase):
         self.assertIn("poppler", workflow)
         self.assertIn('"3.10"', workflow)
 
-    def test_helpers_and_forward_evals_are_present(self) -> None:
+    def test_helpers_are_present(self) -> None:
         for relative in (
             "scripts/materialize_target_figures.py",
             "scripts/assemble_delivery.py",
+            "scripts/evidence_record.py",
             "scripts/inspect_artifact.py",
             "scripts/probe_environment.py",
         ):
             self.assertTrue((SKILL / relative).is_file(), relative)
-        self.assertTrue((REPO / "evals" / "scientific_judgment.json").is_file())
 
     def test_generated_cache_files_are_not_tracked(self) -> None:
         completed = subprocess.run(

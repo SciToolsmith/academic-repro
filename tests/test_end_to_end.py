@@ -296,7 +296,7 @@ class ScientificWorkflowE2ETests(unittest.TestCase):
 
             plan_path = transient / "delivery-plan.json"
             plan = {
-                "schemaVersion": "scirepro.delivery-plan/v4",
+                "schemaVersion": "academic-repro.delivery-plan/v4",
                 "title": "Generic linear-response reproduction",
                 "slug": "generic-linear",
                 "distribution": "local-private",
@@ -417,7 +417,7 @@ class ScientificWorkflowE2ETests(unittest.TestCase):
             write_json(
                 plan_path,
                 {
-                    "schemaVersion": "scirepro.delivery-plan/v4",
+                    "schemaVersion": "academic-repro.delivery-plan/v4",
                     "title": "Mixed figure reproduction",
                     "slug": "mixed-figures",
                     "distribution": "local-private",
@@ -578,7 +578,7 @@ class MechanismAssumptionE2ETests(unittest.TestCase):
             write_json(
                 plan_path,
                 {
-                    "schemaVersion": "scirepro.delivery-plan/v4",
+                    "schemaVersion": "academic-repro.delivery-plan/v4",
                     "title": "Generic saturating-response mechanism reproduction",
                     "slug": "generic-mechanism",
                     "distribution": "shareable",

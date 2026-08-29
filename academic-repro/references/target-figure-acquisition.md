@@ -19,7 +19,7 @@ Preserve supplied files unchanged. Bind a paper target through its figure or tab
 
 For multiple targets, track each one separately and preserve parent-panel relationships. Targets linked by the paper or code may share an experimental lineage; adjacency or visual similarity alone does not establish one. An unresolved target must not block an independently verified target.
 
-Use `scripts/materialize_target_figures.py` when deterministic extraction, normalization, hashing, or replacement is useful. Its normalized image is a viewing aid; the supplied or extracted source remains authoritative.
+Use `scripts/materialize_target_figures.py` when deterministic extraction, normalization, hashing, or replacement is useful. New workspaces use the `academic-repro.targets/v1` manifest identifier. Existing `scirepro.targets/v1` manifests remain readable; updates and derived subsets retain that identifier so older tooling can continue to open them. The normalized image is a viewing aid; the supplied or extracted source remains authoritative.
 
 ## Treat images as evidence, not hidden data
 
