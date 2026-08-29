@@ -32,6 +32,15 @@ class RepositoryTests(unittest.TestCase):
 
         links = list(dict.fromkeys(REFERENCE_LINK.findall(text)))
         self.assertGreaterEqual(len(links), 4)
+        self.assertTrue({
+            "references/diagram-handoff.md",
+            "references/image-derived-reconstruction.md",
+            "references/target-figure-acquisition.md",
+            "references/source-environment-audit.md",
+            "references/execution-validation.md",
+            "references/evidence-contract.md",
+            "references/delivery-contract.md",
+        }.issubset(links))
         for relative in links:
             self.assertTrue((SKILL / relative).is_file(), relative)
 
