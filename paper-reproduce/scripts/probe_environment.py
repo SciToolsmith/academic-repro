@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Privacy-preserving discovery of local runtimes and hardware for Academic Repro."""
+"""Privacy-preserving discovery of local runtimes and hardware for Paper Reproduce."""
 
 from __future__ import annotations
 

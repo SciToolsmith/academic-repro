@@ -1,27 +1,29 @@
-<h1 align="center">Academic Repro</h1>
+<h1 align="center">Paper Reproduce</h1>
 
 <p align="center"><strong>从论文图表与计算结果，回到可信、可运行、可检验的研究过程</strong></p>
-<p align="center">简体中文 · <a href="README.en.md">English</a> · <a href="academic-repro/SKILL.md">Skill 规范</a></p>
+<p align="center">简体中文 · <a href="README.en.md">English</a> · <a href="paper-reproduce/SKILL.md">Skill 规范</a></p>
 
-Academic Repro 是面向 Codex 的学术图表与研究结果复现 Skill。它复现图表背后的仿真、训练、测量、统计或算法过程，并判断结果能否继续支撑同一局部论点。默认目标是局部论点等价，不是假定论文省略的细节都能恢复，也不是把一次成功运行写成对整篇论文的证明；只有用户明确要求且材料足够时，才追求精确数值或视觉一致。
+Paper Reproduce 是面向 Codex 的学术图表与研究结果复现 Skill。它复现图表背后的仿真、训练、测量、统计或算法过程，并判断结果能否继续支撑同一局部论点。默认目标是局部论点等价，不是假定论文省略的细节都能恢复，也不是把一次成功运行写成对整篇论文的证明；只有用户明确要求且材料足够时，才追求精确数值或视觉一致。
 
 ## 安装与调用
 
 ```text
-使用 $skill-installer 安装 https://github.com/SciToolsmith/academic-repro/tree/main/academic-repro
+使用 $skill-installer 安装 https://github.com/SciToolsmith/paper-reproduce/tree/main/paper-reproduce
 ```
 
 ```text
-使用 $academic-repro 复现这篇论文的图 1、图 6 和表 2；结果应能替换原图表而不改变相邻正文的论点。
+使用 $paper-reproduce 复现这篇论文的图 1、图 6 和表 2；结果应能替换原图表而不改变相邻正文的论点。
 ```
 
 以上两段是输入到 Codex 对话中的指令，不是终端 Shell 命令。
+
+更名兼容性：已有目标清单、证据记录和交付计划继续使用原有 schema 标识，可直接复用。
 
 可提供论文与目标图表、论文与图表编号，或仅提供目标图片。仅有图片时，Skill 只重建像素中可以可靠识别的内容，不会把重绘称为原始实验复现。
 
 ## 核心判断
 
-Academic Repro 先判断目标**如何产生、在论文中充当什么证据**，而不是只看外形：
+Paper Reproduce 先判断目标**如何产生、在论文中充当什么证据**，而不是只看外形：
 
 - 仿真、训练、搜索、优化或统计产生的图、定量表、模型结构和拓扑，属于计算结果；即使看起来像结构示意图，也应复现其生成过程。
 - 参数表和场景表通常是复现输入；定性文献比较、符号表和能力清单属于说明内容。
@@ -58,17 +60,17 @@ Academic Repro 先判断目标**如何产生、在论文中充当什么证据**�
 
 证据强度按风险分级：只读评估不创建记录；普通单目标复现保留一份紧凑摘要；只有机器可核验正式包或明确声称“已验证可复跑”时，才绑定证据记录并做干净复跑；随机性、数据划分、泄漏、重复试验等检查只在可能改变结论时启用。这样不会为了填满通用模板而浪费时间和 token。
 
-Skill 的科学判断不依赖特定操作系统。仓库内的辅助脚本需要 Python 3.10+，当前面向 Linux/macOS；完整 Windows 流程暂不支持。PDF 自动定位另需 `Pillow`、`pdfplumber` 和 Poppler，目前自动识别英文 `Fig.`/`Figure` 加正整数；中文图号、补充图、表格、子图或其他复杂标签可由用户提供目标文件或使用经审核的人工标签绑定。完整规则见 [Skill 规范](academic-repro/SKILL.md)。
+Skill 的科学判断不依赖特定操作系统。仓库内的辅助脚本需要 Python 3.10+，当前面向 Linux/macOS；完整 Windows 流程暂不支持。PDF 自动定位另需 `Pillow`、`pdfplumber` 和 Poppler，目前自动识别英文 `Fig.`/`Figure` 加正整数；中文图号、补充图、表格、子图或其他复杂标签可由用户提供目标文件或使用经审核的人工标签绑定。完整规则见 [Skill 规范](paper-reproduce/SKILL.md)。
 
 ## 本地开发与验证
 
 ```bash
-git clone https://github.com/SciToolsmith/academic-repro.git
-cd academic-repro
-python -m pip install -r academic-repro/requirements.txt
+git clone https://github.com/SciToolsmith/paper-reproduce.git
+cd paper-reproduce
+python -m pip install -r paper-reproduce/requirements.txt
 python -m unittest discover -s tests -v
 ```
 
 ## 许可
 
-Academic Repro 采用 [MIT License](LICENSE)。论文、数据集、第三方代码和生成成果仍遵循各自的版权、访问条件与许可证。
+Paper Reproduce 采用 [MIT License](LICENSE)。论文、数据集、第三方代码和生成成果仍遵循各自的版权、访问条件与许可证。

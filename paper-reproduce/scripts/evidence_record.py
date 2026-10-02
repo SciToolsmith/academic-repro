@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a compact Academic Repro evidence record.
+"""Validate a compact Paper Reproduce evidence record.
 
 The record stores only judgment that cannot be derived from the delivery plan.
 Artifact paths and hashes are collapsed into one canonical set digest so the
