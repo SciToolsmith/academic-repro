@@ -26,6 +26,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes poppler-utils
-          python -m pip install --disable-pip-version-check -r academic-repro/requirements.txt
+          python -m pip install --disable-pip-version-check -r paper-reproduce/requirements.txt
       - name: Run offline tests
         run: python -m unittest discover -s tests -v

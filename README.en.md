@@ -1,29 +1,31 @@
-<h1 align="center">Academic Repro</h1>
+<h1 align="center">Paper Reproduce</h1>
 
 <p align="center"><strong>From published figures, tables, and computed structures back to a credible, runnable, testable research process</strong></p>
-<p align="center"><a href="README.md">简体中文</a> · English · <a href="academic-repro/SKILL.md">Skill specification</a></p>
+<p align="center"><a href="README.md">简体中文</a> · English · <a href="paper-reproduce/SKILL.md">Skill specification</a></p>
 
-Academic Repro is a Codex Skill for reproducing the simulation, training, measurement, statistical, or algorithmic process behind an academic figure, table, or computed structure. It asks whether the result still supports the same local paper claim. The default objective is local-claim equivalence, not the assumption that every omitted detail can be recovered; exact numerical or visual identity is pursued only when requested and supported by the available materials.
+Paper Reproduce is a Codex Skill for reproducing the simulation, training, measurement, statistical, or algorithmic process behind an academic figure, table, or computed structure. It asks whether the result still supports the same local paper claim. The default objective is local-claim equivalence, not the assumption that every omitted detail can be recovered; exact numerical or visual identity is pursued only when requested and supported by the available materials.
 
 ## Install and invoke
 
 ```text
-Use $skill-installer to install https://github.com/SciToolsmith/academic-repro/tree/main/academic-repro
+Use $skill-installer to install https://github.com/SciToolsmith/paper-reproduce/tree/main/paper-reproduce
 ```
 
 ```text
-Use $academic-repro to reproduce Figures 1 and 6 and Table 2 from this paper; the results should replace the published targets without changing the nearby argument.
+Use $paper-reproduce to reproduce Figures 1 and 6 and Table 2 from this paper; the results should replace the published targets without changing the nearby argument.
 ```
 
 Enter both instructions above in a Codex conversation; they are not shell commands.
+
+Rename compatibility: existing target-manifest, evidence-record, and delivery-plan schema identifiers are retained so saved work remains readable.
 
 Inputs may be a paper with target images, a paper with figure or table identifiers, or target images alone. With images alone, the Skill reconstructs only content reliably identifiable from pixels and does not call that a reproduction of the original experiment.
 
 ## Core decisions
 
-Academic Repro first asks **how the target was produced and what evidence role it has**, not merely what it looks like:
+Paper Reproduce first asks **how the target was produced and what evidence role it has**, not merely what it looks like:
 
-- A figure, quantitative table, model structure, or topology produced by simulation, training, search, optimization, or statistics is a computational result. It remains an Academic Repro target even when it looks schematic.
+- A figure, quantitative table, model structure, or topology produced by simulation, training, search, optimization, or statistics is a computational result. It remains a Paper Reproduce target even when it looks schematic.
 - Parameter and scenario tables are usually reproduction inputs; qualitative literature comparisons, notation tables, and capability checklists are explanatory.
 - Only author-drawn theory, process, or mechanism diagrams that are not themselves computational outputs are handed to a scientific-diagram tool.
 - One table may mix input, computed, and explanatory cells; classify it by column or cell group.
@@ -58,17 +60,17 @@ If the exact target depends on unpublished, non-regenerable author-specific raw 
 
 Evidence effort scales with risk: read-only assessment creates no record; an ordinary single-target reproduction keeps one compact summary; only a formal machine-verifiable package or an explicit `verified`/`rerunnable` claim binds evidence and requires a clean rerun. Checks for randomness, splits, leakage, or repeated trials are enabled only when they could change the conclusion, avoiding a universal form that wastes time and tokens.
 
-The scientific decision workflow is operating-system independent. Bundled helpers require Python 3.10+ and currently target Linux/macOS; the complete workflow is not supported on Windows. Automatic PDF target location also needs `Pillow`, `pdfplumber`, and Poppler and currently recognizes English `Fig.`/`Figure` followed by a positive integer. Chinese labels, supplementary figures, tables, panels, and other complex labels can be supplied directly or bound with a reviewed manual label. See the [Skill specification](academic-repro/SKILL.md) for the full workflow.
+The scientific decision workflow is operating-system independent. Bundled helpers require Python 3.10+ and currently target Linux/macOS; the complete workflow is not supported on Windows. Automatic PDF target location also needs `Pillow`, `pdfplumber`, and Poppler and currently recognizes English `Fig.`/`Figure` followed by a positive integer. Chinese labels, supplementary figures, tables, panels, and other complex labels can be supplied directly or bound with a reviewed manual label. See the [Skill specification](paper-reproduce/SKILL.md) for the full workflow.
 
 ## Local development and validation
 
 ```bash
-git clone https://github.com/SciToolsmith/academic-repro.git
-cd academic-repro
-python -m pip install -r academic-repro/requirements.txt
+git clone https://github.com/SciToolsmith/paper-reproduce.git
+cd paper-reproduce
+python -m pip install -r paper-reproduce/requirements.txt
 python -m unittest discover -s tests -v
 ```
 
 ## License
 
-Academic Repro is released under the [MIT License](LICENSE). Papers, datasets, third-party code, and generated artifacts retain their respective rights, access conditions, and licenses.
+Paper Reproduce is released under the [MIT License](LICENSE). Papers, datasets, third-party code, and generated artifacts retain their respective rights, access conditions, and licenses.

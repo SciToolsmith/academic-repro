@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Materialize one or more Academic Repro target figures from a paper or image set."""
+"""Materialize one or more Paper Reproduce target figures from a paper or image set."""
 
 from __future__ import annotations
 
@@ -564,7 +564,7 @@ def _caption_candidates(
     """Return geometric caption candidates without merging two PDF columns.
 
     A full-page `extract_words` line can silently concatenate a left-column
-    caption with right-column prose at the same y coordinate.  Academic Repro first
+    caption with right-column prose at the same y coordinate.  Paper Reproduce first
     indexes each half-column independently and fails closed when two equally
     plausible candidates remain.  Full-width captions are considered only
     when neither half contains the requested marker.
@@ -2130,7 +2130,7 @@ def main() -> int:
         require(TARGET_ID.fullmatch(args.target_set_id) is not None, "invalid --target-set-id")
         return materialize(args)
     except (OSError, json.JSONDecodeError, TargetError) as exc:
-        print(f"Academic Repro target acquisition failed: {exc}", file=sys.stderr)
+        print(f"Paper Reproduce target acquisition failed: {exc}", file=sys.stderr)
         return 2
 
 

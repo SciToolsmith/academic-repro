@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SKILL = REPO / "academic-repro"
+SKILL = REPO / "paper-reproduce"
 
 
 class BehaviorContractTests(unittest.TestCase):

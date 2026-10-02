@@ -1,9 +1,9 @@
 ---
-name: academic-repro
+name: paper-reproduce
 description: Reproduce or assess computation- and data-derived research results, including figures, quantitative tables, and generated structures. Use for recomputation, independent reimplementation, mechanism checks, or bounded validation. Not for paper summaries, author-drawn explanatory diagrams, or styling-only edits.
 ---
 
-# Academic Repro
+# Paper Reproduce
 
 Reproduce a defensible target-producing process and test its local claim—not hidden details or a reported number at any cost. Default to claim equivalence; pursue exact identity only when requested and supported. Treat mismatch as evidence, not a tuning objective.
 
@@ -20,7 +20,7 @@ Classify the target by how it was produced:
 
 - **Computed result:** output of measurement, simulation, equations, statistics, training, search, optimization, or another algorithm. Generated structures that resemble schematics remain computed results.
 - **Input or condition:** a parameter, scenario, configuration, geometry, or dataset description; treat it as input unless its derivation is the target.
-- **Explanatory artifact:** an author-drawn theory, mechanism, process, or system diagram outside Academic Repro. Read [diagram-handoff.md](references/diagram-handoff.md) only when reconstruction is requested.
+- **Explanatory artifact:** an author-drawn theory, mechanism, process, or system diagram outside Paper Reproduce. Read [diagram-handoff.md](references/diagram-handoff.md) only when reconstruction is requested.
 - **Image-only evidence:** pixels without enough paper, data, or method context. Recover only identifiable content; read [image-derived-reconstruction.md](references/image-derived-reconstruction.md).
 
 Visual form never decides the route. Split mixed figures or tables when their parts have different origins. Resolve identity from captions, nearby text, numbering, axes, units, and legends. Read [target-figure-acquisition.md](references/target-figure-acquisition.md) only when extraction or multi-target binding is needed.

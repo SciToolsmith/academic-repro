@@ -14,11 +14,11 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPT = REPO / "academic-repro" / "scripts" / "probe_environment.py"
+SCRIPT = REPO / "paper-reproduce" / "scripts" / "probe_environment.py"
 
 
 def load_probe_module() -> object:
-    module_name = "academic_repro_probe_environment_under_test"
+    module_name = "paper_reproduce_probe_environment_under_test"
     specification = importlib.util.spec_from_file_location(module_name, SCRIPT)
     if specification is None or specification.loader is None:
         raise RuntimeError(f"Cannot load probe module from {SCRIPT}")

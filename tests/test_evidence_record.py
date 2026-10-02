@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPTS = REPO / "academic-repro" / "scripts"
+SCRIPTS = REPO / "paper-reproduce" / "scripts"
 VALIDATOR = SCRIPTS / "evidence_record.py"
 sys.path.insert(0, str(SCRIPTS))
 

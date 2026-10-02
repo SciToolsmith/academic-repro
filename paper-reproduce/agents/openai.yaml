@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paper Reproduce"
+  short_description: "复现或评估论文中的计算图表与定量结果，并明确科学证据边界"
+  default_prompt: "Use $paper-reproduce to assess or reproduce this paper target. Prefer usable target-relevant author source in its native runtime, treat reported values as tests rather than tuning goals, and keep delivery concise. For multiple independently understandable targets, package one learnable reproduction unit per folder and keep shared material once. If an indispensable non-regenerable input is unavailable after a bounded authoritative check, stop the exact route before fallback construction and provide only the requested concise blocked note."

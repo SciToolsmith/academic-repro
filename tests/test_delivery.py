@@ -14,8 +14,8 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-ASSEMBLER = REPO / "academic-repro/scripts/assemble_delivery.py"
-SCRIPTS = REPO / "academic-repro" / "scripts"
+ASSEMBLER = REPO / "paper-reproduce/scripts/assemble_delivery.py"
+SCRIPTS = REPO / "paper-reproduce" / "scripts"
 MAX_FILE_BYTES = 256 * 1024 * 1024
 sys.path.insert(0, str(SCRIPTS))
 

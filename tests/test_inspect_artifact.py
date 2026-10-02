@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-SCRIPT = REPO / "academic-repro" / "scripts" / "inspect_artifact.py"
+SCRIPT = REPO / "paper-reproduce" / "scripts" / "inspect_artifact.py"
 
 
 class InspectArtifactTests(unittest.TestCase):
